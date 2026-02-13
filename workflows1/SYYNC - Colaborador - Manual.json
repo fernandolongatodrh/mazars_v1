@@ -1,0 +1,642 @@
+{
+  "updatedAt": "2026-02-02T20:56:05.474Z",
+  "createdAt": "2025-10-09T21:49:00.771Z",
+  "id": "DA8LmyVqTwREn2l2",
+  "name": "SYYNC - Colaborador - Manual",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://syync.lince.com.br/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\"credentials\": {\n\"login\": \"lincetech@integracao.segalas\",\n\"password\": \"sf48VsRsgrQjt79I@\"\n}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        224
+      ],
+      "id": "3006c280-d87f-4a4c-8262-e60bf974c084",
+      "name": "HTTP_SYYNC"
+    },
+    {
+      "parameters": {
+        "jsCode": "// O item recebido é igual ao seu exemplo\nconst input = items[0].json;\n\n// Faz o parse do campo data\nconst parsed = JSON.parse(input.data);\n\n// Retorna no formato desejado\nreturn [{ json: parsed }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        224
+      ],
+      "id": "5d13e1fa-f24d-4d50-ae59-ddb8de43962e",
+      "name": "TokenSYYNC"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant }}.mazars.com.br/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        224
+      ],
+      "id": "f3f190cc-3db5-485c-a606-a22cc8ea150b",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"pagina\" : 1,\n  \"tenant\":\"s443dirhect\"\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        224
+      ],
+      "id": "b91e8b15-e75b-47a2-b6d4-69a664a32538",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/funcionario/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "created_at__gte",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd\") }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1168,
+        224
+      ],
+      "id": "98fd921b-ca1a-461e-a314-0cf0cbaf8b10",
+      "name": "Funcionario"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/horario/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $json.codigo_jornada }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1616,
+        224
+      ],
+      "id": "3b7cc525-9b2c-4996-be3c-7d483fc5dc46",
+      "name": "Horario",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"employees\": [\n  {\n    \"cost_center\": { \"code\": \"{{ $('Funcionario').item.json.secao_origem_id.replaceAll('.','') }}\", \n    \"label\": \"{{ $('Funcionario').item.json.secao_nome }}\"\n},\n  \"department\": { \n    \"code\": \"{{ $('Funcionario').item.json.secao_origem_id.replaceAll('.','') }}\", \n    \"label\": \"{{ $('Funcionario').item.json.secao_nome }}\"\n  },\n  \"job_role\": { \n    \"code\":  \"{{ $('Funcionario').item.json.funcao_origem_id }}\",\n    \"label\": \"{{ $('Funcionario').item.json.funcao_nome }}\"\n  },\n  \"work_shift\": { \n    \"code\": \"{{ $('Horario').item.json.id_origem}}\",  \n    \"label\": \"{{ $('Horario').item.json.descricao }}\", \n    \"description\": \"{{ $('Horario').item.json.descricao }}\"\n  },\n  \"office_shift\": { \n    \"code\": {{\n  (() => {\n    const desc = $('Horario').item.json.descricao || '';\n  \n\n    const m = desc.match(/(?:^|[^0-9])((?:[01]?\\d|2[0-3]):[0-5]\\d)/);\n    if (!m) return '99';\n    const [hh, mm] = m[1].split(':').map(n => parseInt(n,10));\n    const mins = hh*60 + mm;\n\n    if (mins >= 17*60) return '3';       // >= 17:00\n    if (mins >= 12*60) return '2';       // >= 12:00\n    if (mins >=  7*60) return '9';   // >= 07:00\n    if (mins >=  4*60 + 30) return '1';  // >= 04:30\n    if (mins <  4*60 + 30) return '3';  // < 04:30\n    return null;                 // < 04:30\n  })()\n}}, \n    \"label\": \"{{\n  (() => {\n    const desc = $('Horario').item.json.descricao || '';\n    if (/INATIVO/i.test(desc)) return 'inativo';\n    if (/ART(?:IGO)?\\s*62/i.test(desc)) return 'regra_especial_art62';\n\n    const m = desc.match(/(?:^|[^0-9])((?:[01]?\\d|2[0-3]):[0-5]\\d)/);\n    if (!m) return 'fora_regra';\n    const [hh, mm] = m[1].split(':').map(n => parseInt(n,10));\n    const mins = hh*60 + mm;\n\n    if (mins >= 17*60) return '3º TURNO';       // >= 17:00\n    if (mins >= 12*60) return '2º TURNO';       // >= 12:00\n    if (mins >=  7*60) return 'GERAL';   // >= 07:00\n    if (mins >=  4*60 + 30) return '1º TURNO';  // >= 04:30\n    if (mins <  4*60 + 30) return '3º TURNO';  // >= 04:30\n    return null;                 // < 04:30\n  })()\n}}\"\n  },\n  \"education\": {\"label\": \"{{ $('GrauInstrucao').item.json.registro.descricao }}\"},\n  \"company\": \"{{ $('Filial').item.json.cnpj }}\", \n  \"document\": \"{{ $('Funcionario').item.json.funcionario_pessoa_fisica.cpf }}\",\n  \"name\": \"{{ $('Funcionario').item.json.funcionario_pessoa_fisica.nome }}\", \n  \"badge_code\": {{ \nNumber(\n$('Funcionario').item.json.chapa )}},  \n  \"born_date\": \"{{ $('Funcionario').item.json.funcionario_pessoa_fisica.data_nascimento }}\",\n  \"mother_name\": \"{{ $('Funcionario').item.json.dependentes.find(dep => dep.grau_parentesco === 5)?.nome_depend }}\", \n  \"admission_date\": \"{{ $('Funcionario').item.json.dt_admissao }}\", \n  \"dismissal_date\": \"{{ $('Funcionario').item.json.dt_demissao }}\",\n  \"bank_name\": \"{{ $('Banco').item.json.nome }}\",\n  \"bank_code\": {{ $('Funcionario').item.json.banco.toNumber() }},\n  \"bank_agency\": {{ $('Funcionario').item.json.agencia.toNumber() }},\n  \"bank_account\":{{ $('Funcionario').item.json.conta_corrente.toString().slice(0, -1).toNumber() }}, \n  \"agency_digit\":\"{{ $('Funcionario').item.json.conta_corrente.toString().slice(-1).toNumber() }}\",\n  \"code_pis\": \"{{ $('Funcionario').item.json.pispasep }}\", \n  \"ctps_number\":{{ $('Funcionario').item.json.funcionario_pessoa_fisica.carteira_trabalho.toNumber() }},\n  \"ctps_series\": {{ $('Funcionario').item.json.funcionario_pessoa_fisica.serie_carteira_trab.toNumber() }},\n  \"outsourced\": false,\n  \"employee_status\": {{ $('Funcionario').item.json.tipo_situacao_descricao === 'Demitido' ? 5 : 1 }},\n  \"employee_gender\": {{ $('Funcionario').item.json.funcionario_pessoa_fisica.sexo === null ? 1 : ($('Funcionario').item.json.funcionario_pessoa_fisica.sexo === '3' ? 2 : ($('Funcionario').item.json.funcionario_pessoa_fisica.sexo === '4' ? 3 : 1)) }}\n\n}\n]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2512,
+        224
+      ],
+      "id": "80a40a28-cc17-4f9f-964f-f0c6ff693093",
+      "name": "De Para",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const cleanedData = {};\n\n  for (const key in item.json) {\n    const value = item.json[key];\n    // Remove se for null, \"null\", undefined ou string vazia\n    if (value !== null && value !== \"null\" && value !== undefined && value !== \"\") {\n      cleanedData[key] = value;\n    }\n  }\n\n  return { json: { dados: JSON.stringify(cleanedData) } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        224
+      ],
+      "id": "020c6e6b-54ab-44fa-9f8f-a820e84e9b79",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://syync.lince.com.br/api/integration/external/employees",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('TokenSYYNC').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.dados }}",
+        "options": {
+          "batching": {
+            "batch": {}
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2960,
+        224
+      ],
+      "id": "52a38faf-4a9c-411d-a4f5-edb6d480cdfb",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{ \n  \"pagina\" : 1\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        224
+      ],
+      "id": "5861ae99-5be8-4338-8918-0044b1929d19",
+      "name": "PaginaInicial"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/filial/{{ $('Funcionario').item.json.filial }}/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        224
+      ],
+      "id": "be9c95b7-b881-464b-b3f3-3d7fa5dda3ab",
+      "name": "Filial",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/banco/{{ $('Funcionario').item.json.banco }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2064,
+        224
+      ],
+      "id": "a8467ed3-04d3-460f-b090-31ebff699d6e",
+      "name": "Banco",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95f6bf74-5261-4045-a91a-55b6a4977c47",
+              "name": "id",
+              "value": "2340",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -176,
+        224
+      ],
+      "id": "e067341e-aa84-4d82-abd3-ed2971ba1160",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        128
+      ],
+      "id": "6556363d-7fd6-4b6b-8292-772b6f2bd2ab",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/tabela_dominio/grau_instrucao/{{ $('Funcionario').item.json.grau_instrucao ?? 96 }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2288,
+        224
+      ],
+      "id": "6fea6362-4104-432d-b634-262b8fac226c",
+      "name": "GrauInstrucao",
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        320
+      ],
+      "id": "6fd5202b-0571-469f-8f44-657046208b33",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "300281f2-399c-4a45-b276-baf09c2bfa00",
+              "leftValue": "={{ $json.created_at }}",
+              "rightValue": "={{ $now.toFormat(\"yyyy-MM-dd\") }}T00:00:00",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1392,
+        224
+      ],
+      "id": "ace3f732-08ad-4ab1-96f2-e17fbf817479",
+      "name": "Filter"
+    }
+  ],
+  "connections": {
+    "HTTP_SYYNC": {
+      "main": [
+        [
+          {
+            "node": "TokenSYYNC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenSYYNC": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "PaginaInicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Funcionario": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Horario": {
+      "main": [
+        [
+          {
+            "node": "Filial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "PaginaInicial": {
+      "main": [
+        [
+          {
+            "node": "Funcionario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filial": {
+      "main": [
+        [
+          {
+            "node": "Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banco": {
+      "main": [
+        [
+          {
+            "node": "GrauInstrucao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP_SYYNC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GrauInstrucao": {
+      "main": [
+        [
+          {
+            "node": "De Para",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Horario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-01-27T23:30:25.013-03:00",
+          "Readable date": "January 27th 2026, 11:30:25 pm",
+          "Readable time": "11:30:25 pm",
+          "Day of week": "Tuesday",
+          "Year": "2026",
+          "Month": "January",
+          "Day of month": "27",
+          "Hour": "23",
+          "Minute": "30",
+          "Second": "25",
+          "Timezone": "America/Sao_Paulo (UTC-03:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "9608e406-e543-4f14-a693-ab161c901335",
+  "activeVersionId": "9608e406-e543-4f14-a693-ab161c901335",
+  "versionCounter": 9,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-09T21:49:00.771Z",
+      "createdAt": "2025-10-09T21:49:00.771Z",
+      "role": "workflow:owner",
+      "workflowId": "DA8LmyVqTwREn2l2",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
