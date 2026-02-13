@@ -1,0 +1,626 @@
+{
+  "updatedAt": "2025-11-26T19:29:40.898Z",
+  "createdAt": "2025-07-23T10:25:37.963Z",
+  "id": "H0XEZRRmZtyvcuEk",
+  "name": "Gupy - Consome Fila",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"titulo\": \"{{ $('Trigger').item.json.body.data.job.name }}\",\n  \"dt_abertura\": \"{{ $('Trigger').item.json.body.date.split('T')[0] }}\",\n  \"dt_encerramento\": \"{{ \n  (() => {\n    const date = new Date($('Trigger').item.json.body.date.split('T')[0]);\n    date.setDate(date.getDate() + 7);\n    return date.toISOString().split('T')[0];\n  })()\n}}\",\n  \"deficiencia\": {{ $('Trigger').item.json.body.data.candidate.disabilities ?? false }},\n  \"qtd_vaga\": 1,\n  \"status\": \"A\",\n  \"id_origem\": \"{{ $('Trigger').item.json.body.data.job.id }}\",\n  \"filial\": {{ $json.filial.id }},\n  \"departamento\": {{ $json.departamento }},  \n  \"funcao\": null,  \n  \"salario\": {{ $('Trigger').item.json.body.data.application.salary.value || 0 }} ,\n  \"secao\": {{ $json.id }},\n  \"descricao\": \"Vaga Integrada da GUPY | ID: {{ $('Trigger').item.json.body.data.job.id }}\"\n}",
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        -224
+      ],
+      "id": "c61b2a98-0c06-47a2-94f0-1921e6d459f7",
+      "name": "DePara_Vagas"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/vagas/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Code').item.json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        -224
+      ],
+      "id": "ee765a8d-df63-400f-ad58-ff5adef21b73",
+      "name": "Post Vagas"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = item.json[key] === \"null\" ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -224
+      ],
+      "id": "db3ea120-5a11-4a36-ab64-2ff82a3bb9bd",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant\":\"s443dirhect\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1072,
+        -224
+      ],
+      "id": "c7efc6e8-fc1d-48b0-8385-45308886b08a",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant }}.mazars.com.br/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -848,
+        -224
+      ],
+      "id": "af570c2a-36ea-4d60-bddf-5f3647f41800",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        16
+      ],
+      "id": "227aa315-3424-4ab0-9952-cf8fa224748e",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \n  \"nome\": \"{{ $('Trigger').item.json.body.data.candidate.name }} {{ $('Trigger').item.json.body.data.candidate.lastName }}\",\n  \"cpf\": \"{{ $('Trigger').item.json.body.data.candidate.identificationDocument }}\",\n  \"email\": \"{{ $('Trigger').item.json.body.data.candidate.email }}\",\n  \"telefone\": \"{{ $('Trigger').item.json.body.data.candidate.mobileNumber }}\",\n  \"dt_nascimento\": \"{{ $('Trigger').item.json.body.data.candidate.birthdate }}\",\n  \"salario\": \"{{ $('Trigger').item.json.body.data.application.salary.value || 0 }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -224
+      ],
+      "id": "f4202a1a-802f-4675-9229-f66a1d49f2cb",
+      "name": "DePara - Candidato"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = item.json[key] === \"null\" ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -224
+      ],
+      "id": "0adff11b-7f47-4ed7-8a19-3c23e534f593",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/candidato/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1056,
+        16
+      ],
+      "id": "db83f002-b122-491f-ad84-992f0bc5d73f",
+      "name": "Post Candidato"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"dt_inscricao\": \"{{ $('Trigger').item.json.body.data.application.hiringDate .split('T')[0]}}\",\n  \"status\": \"S\",  \n  \"candidato\": {{ $json.id }},\n  \"vaga\": {{ $('Post Vagas').item.json.id }}\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        16
+      ],
+      "id": "32f245b6-573b-4089-8f15-f0613a61e4ea",
+      "name": "DePara VagasCandidato"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = item.json[key] === \"null\" ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        16
+      ],
+      "id": "fa6c30f2-e0f8-4939-add4-30ccc7f1caf5",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/vagas_candidatos/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        16
+      ],
+      "id": "42e4b93f-3be2-41d8-978c-4a3c41da8d32",
+      "name": "Post VagaCandidato"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/vagas_candidatos/{{ $json.id }}/seguir/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "4993d4d6-8e94-4832-892f-aa4485009963",
+      "name": "Post VagaCandidatoSeguir"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = item.json[key] === \"null\" ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        16
+      ],
+      "id": "21143c92-b3e2-42a8-93be-15decce2f6e5",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={  \n  \"salario\": {{ $('Trigger').item.json.body.data.application.salary.value || 0 }},\n  \"sexo\": \"{{ \n  $('Trigger').item.json.body.data.candidate.gender === 'Male' \n    ? 'M' \n    : ($('Trigger').item.json.body.data.candidate.gender === 'Female' \n      ? 'F' \n      : '') \n}}\",  \n  \"rua\": \"{{ $('Trigger').item.json.body.data.candidate.addressStreet }}\",\n  \"numero\":{{\n  (() => {\n    const value = $('Trigger').item.json.body.data.candidate.addressNumber?.split('-')[0]?.trim();\n    return value ? value : null;\n  })()\n}},\n  \"complemento\": \"{{\n  (() => {\n    const value = $('Trigger').item.json.body.data.candidate.addressNumber?.split('-')[1]?.trim();\n    return value ? value : '';\n  })()\n}}\",  \n  \"estado\": \"{{ $('Trigger').item.json.body.data.candidate.addressStateShortName }}\",\n  \"cidade\": \"{{ $('Trigger').item.json.body.data.candidate.addressCity }}\",\n  \"cep\": \"{{ $('Trigger').item.json.body.data.candidate.addressZipCode }}\",\n  \"pais\": 1, \n  \"pais_gupy\": \"{{ $('Trigger').item.json.body.data.candidate.addressCountry }}\", \n  \"telefone1\": \"{{ $('Trigger').item.json.body.data.candidate.mobileNumber }}\"  \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        16
+      ],
+      "id": "ba448d27-f03d-4d13-a791-54130e9b0813",
+      "name": "DePara Admissao"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/admissao/{{ $('Post VagaCandidatoSeguir').item.json.admissao_id }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        16
+      ],
+      "id": "b0ca705f-1bad-48fc-958b-d660c7c87bb9",
+      "name": "PUT Admissao"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -128
+      ],
+      "id": "4c9407d8-4f93-4b6d-ac78-5c96795362e3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/secao/?id_origem=\n{{\n  (() => {\n    const branchCode = $('Trigger').item.json.body.data.job.branchCode;\n    const deptCode = $('Trigger').item.json.body.data.job.departmentCode;\n\n    // Se qualquer parte for nula, indefinida ou vazia, retorna '0'\n    if (!branchCode || !deptCode) {\n      return '0';\n    }\n\n    const prefix = branchCode.substring(0, 2);\n    let result = '0';\n\n    if (prefix === '02' || prefix === '03') {\n      result = branchCode.substring(0, 5) + '.' + deptCode;\n    }\n\n    // Caso resultado seja nulo, undefined ou string vazia\n    return result && result.trim() !== '' ? result : '0';\n  })()\n}}\n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -624,
+        -224
+      ],
+      "id": "b4a7c8f0-7830-4c06-bed5-72ecacf31f87",
+      "name": "Get Secao"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\"body\":{\n\"companyName\": \"SEGALAS ALIMENTOS LTDA.\",\n\"event\": \"candidate.hired\",\n\"id\": \"f4ed834e-cca2-4005-b4ed-d2d09b000809\",\n\"date\": \"2025-07-31T14:29:49.478Z\",\n\"data\": {\n\"job\": {\n\"departmentCode\": \"020\",\n\"roleCode\": null,\n\"branchCode\": null,\n\"customFields\": [\n],\n\"id\": 9310325,\n\"name\": \"Representante Comercial Autônomo\",\n\"type\": \"vacancy_legal_entity\",\n\"department\": {\n\"id\": 797327,\n\"code\": \"020\",\n\"name\": \"Comercial\",\n\"similarity\": \"commercial\"\n},\n\"role\": {\n\"id\": 1338697,\n\"code\": null,\n\"name\": \"Representante Comercial Autônomo\",\n\"similarity\": \"analyst\"\n},\n\"branch\": null\n},\n\"application\": {\n\"hiringType\": \"employee_admission\",\n\"preHiringInformation\": {\n},\n\"id\": 585470883,\n\"score\": 62.314698946598675,\n\"partnerName\": \"gupy_public_page\",\n\"status\": \"hired\",\n\"tags\": [\n\"tagHired\"\n],\n\"currentStep\": {\n\"id\": 54565710,\n\"name\": \"Contratação\",\n\"type\": \"final\"\n},\n\"vacancyCodeId\": null,\n\"vacancyCode\": null,\n\"hiringDate\": \"2025-07-30T03:00:00.000Z\",\n\"salary\": null\n},\n\"candidate\": {\n\"name\": \"Andressa\",\n\"lastName\": \"Lazzarotto\",\n\"email\": \"andressa_lazzarotto@yahoo.com.br\",\n\"identificationDocument\": \"00959578986\",\n\"countryOfOrigin\": \"BR\",\n\"birthdate\": \"1986-05-16\",\n\"addressZipCode\": \"88113-825\",\n\"addressStreet\": \"Rua Manoel Bandeira\",\n\"addressNumber\": \"\",\n\"addressCity\": \"São José\",\n\"addressState\": \"Santa Catarina\",\n\"addressStateShortName\": \"SC\",\n\"addressCountry\": \"Brasil\",\n\"addressCountryShortName\": \"BR\",\n\"mobileNumber\": \"+5548984122771\",\n\"phoneNumber\": null,\n\"schooling\": \"technological\",\n\"schoolingStatus\": \"incomplete\",\n\"disabilities\": false,\n\"id\": 27856451,\n\"gender\": \"Female\"\n},\n\"user\": {\n\"id\": 1103031,\n\"name\": \"Fernanda Silva\",\n\"email\": \"fernanda.silva@segalas.com.br\",\n\"code\": null\n}\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1376,
+        96
+      ],
+      "id": "7da69023-4e36-4a1d-a851-91837c52f8f4",
+      "name": "Trigger TESTE"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_Admissao_GUPY",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          },
+          "jsonParseBody": true,
+          "onlyContent": true
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -320
+      ],
+      "id": "0c178a4e-f025-4b64-8729-2d7c8736770d",
+      "name": "Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "DePara_Vagas": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Vagas": {
+      "main": [
+        [
+          {
+            "node": "DePara - Candidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Post Vagas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "Get Secao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DePara - Candidato": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Post Candidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Candidato": {
+      "main": [
+        [
+          {
+            "node": "DePara VagasCandidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DePara VagasCandidato": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Post VagaCandidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post VagaCandidato": {
+      "main": [
+        [
+          {
+            "node": "Post VagaCandidatoSeguir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post VagaCandidatoSeguir": {
+      "main": [
+        [
+          {
+            "node": "DePara Admissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DePara Admissao": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "PUT Admissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PUT Admissao": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Secao": {
+      "main": [
+        [
+          {
+            "node": "DePara_Vagas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger TESTE": {
+      "main": [
+        []
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "db635c84-629f-45a9-8b0d-1f5ef42874e2",
+  "activeVersionId": "db635c84-629f-45a9-8b0d-1f5ef42874e2",
+  "versionCounter": 6,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-07-23T10:25:37.963Z",
+      "createdAt": "2025-07-23T10:25:37.963Z",
+      "role": "workflow:owner",
+      "workflowId": "H0XEZRRmZtyvcuEk",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
