@@ -1,0 +1,584 @@
+{
+  "updatedAt": "2025-12-12T01:04:23.414Z",
+  "createdAt": "2025-10-13T18:14:59.769Z",
+  "id": "xIPGGkhqdUvPJvQ2",
+  "name": "PRD - Colaboradores -  3 - Consome Fila Dependentes",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"referencias\": {\n    \"tarefa_id\": \"{{ $json.referencias.tarefa_id }}\",\n    \"tenant_id\": \"{{ $json.referencias.tenant_id }}\",\n    \"tenant_nome\": \"{{ $json.referencias.tenant_nome }}\",\n    \"tenant_domain\": \"{{ $json.referencias.tenant_domain }}\",\n    \"tenant_schema\": \"{{ $json.referencias.tenant_schema }}\"\n  },\n  \"sistema_origem\": {\n    \"servidor\": \"{{ $json.sistema_origem.servidor }}\",\n    \"porta_soap\":{{ $json.sistema_origem.porta_soap }},\n    \"porta_rest\": {{ $json.sistema_origem.porta_rest }},\n    \"autorizacao\": \"{{ $json.sistema_origem.autorizacao }}\",\n    \"coligada\": {{ $json.sistema_origem.coligada }}\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        304
+      ],
+      "id": "0e6dfe20-609b-440b-a9fd-c3ed678ecde7",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Credenciais').item.json.sistema_origem.servidor }}:{{ $('Credenciais').item.json.sistema_origem.porta_rest }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_DEPEND/0/P?parameters=\nCODCOLIGADA%3D{{ $('Credenciais').item.json.sistema_origem.coligada }}%3BDATAMOD%3D{{  $('Credenciais').item.json.sistema_origem.datamod ?? '19000101' }}%3BCHAPA%3D{{ $('PFUNC').item.json.CHAPA }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('PFUNC').item.json.sistema_origem.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('PFUNC').item.json.sistema_origem.coligada }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "c1951054-1414-402f-a939-0a2d8b57cd65",
+      "name": "DEPEND",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        752,
+        304
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = (item.json[key] === \"null\" || item.json[key] === \"undefined\" || item.json[key] === undefined) ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        208
+      ],
+      "id": "9b9e1a08-c111-4e0a-84fd-250b14826f1f",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/dependente/bulk-upsert/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{{ $json.dados }}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2528,
+        208
+      ],
+      "id": "d15970ea-8c19-4eac-add4-3a202b9c0a95",
+      "name": "HTTP Request7",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"id_funcionario__chapa\":\"{{$('DEPEND').item.json.CHAPA}}\",\n\"chapa\":\"{{$('DEPEND').item.json.CHAPA}}\",\n\"nrodepend\": \"{{$('DEPEND').item.json.NRODEPEND || ''}}\",\n\"nome_depend\": \"{{$('DEPEND').item.json.NOME.replace(/[^\\p{L}\\p{N}\\s'’\\-.]/gu, '').trim()}}\",\n\"cpf\":  \"{{$('DEPEND').item.json.CPF || ''}}\",\n\"dtnascimento\":  \"{{$('DEPEND').item.json.DTNASCIMENTO ? $('DEPEND').item.json.DTNASCIMENTO.split('T')[0] : null}}\",\n\"sexo\":  {{ $('SEXO').item.json.registros[0].id ?? 0 }},\n\"estadocivil\":  {{ $('ESTADOCIVIL').item.json.registros[0].id || 0 }},\n\"cartorio\":  \"{{$('DEPEND').item.json.CARTORIO || ''}}\",\n\"nroregistro\":  \"{{$('DEPEND').item.json.NROREGISTRO || ''}}\",\n\"nrolivro\":  \"{{$('DEPEND').item.json.NROLIVRO || ''}}\",\n\"nrofolha\":  \"{{$('DEPEND').item.json.NROFOLHA || ''}}\",\n\"grau_parentesco\": {{ $json.registros[0].id || 0 }},\n\"cartao_vacina\":  \"{{$('DEPEND').item.json.CARTAOVACINA || ''}}\",\n\"nrosus\":  \"{{$('DEPEND').item.json.NUMEROCARTAOSUS || ''}}\",\n\"nronascidovivo\":  \"{{$('DEPEND').item.json.NUMDECLARANASCVIVO || ''}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2080,
+        208
+      ],
+      "id": "0e64c507-0692-4327-b857-f2444bd9c831",
+      "name": "De Para - Depend"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Dependentes_PFDEPEND",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          },
+          "jsonParseBody": true,
+          "onlyContent": true,
+          "parallelMessages": 20
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        304
+      ],
+      "id": "3020d479-a605-46e7-8366-6f9efee01df8",
+      "name": "PFUNC",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.referencias.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        304
+      ],
+      "id": "52aad8f3-d62e-4d7f-a527-6ec5b061b916",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/estado_civil/?id_origem={{ $('DEPEND').item.json.ESTADOCIVIL.toUpperCase() }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1408,
+        208
+      ],
+      "id": "9c8e30ff-e987-4861-8170-75376cda430d",
+      "name": "ESTADOCIVIL"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2976,
+        208
+      ],
+      "id": "bb07833e-9c3a-43f5-852e-9a80982aca60",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f602413a-82f9-4245-9cdf-4d658a54a867",
+              "leftValue": "={{ $json.CODCOLIGADA.toString() }}",
+              "rightValue": "={{ $('PFUNC').item.json.CODCOLIGADA.toString() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        304
+      ],
+      "id": "054750cb-d1c3-419f-845d-60de457e23b6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1408,
+        400
+      ],
+      "id": "199d73f5-5153-4d63-9183-c0feb640106d",
+      "name": "RabbitMQ1",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/genero/?id_origem={{ $('DEPEND').item.json.SEXO.toUpperCase() }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        208
+      ],
+      "id": "49ec52e0-8760-4d82-a2ef-77e6790591a4",
+      "name": "SEXO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/grau_parentesco/?id_origem={{ $('DEPEND').item.json.GRAUPARENTESCO.toUpperCase() }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1856,
+        208
+      ],
+      "id": "c6381a50-af80-42a4-bca1-8feedcfd82f1",
+      "name": "GRAUPARENTESCO"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        208
+      ],
+      "id": "4131a52f-dfd7-42f9-9ffa-eee5a18bfc7a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "MdGxhyDm6WJV5xQh",
+          "mode": "list",
+          "cachedResultName": "erro_dependente",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/MdGxhyDm6WJV5xQh"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "erro": "={{ $json.error.message.split(' - ')[1].replaceAll(/[{}[\\]\"\\\\]/g, ' ').trim() }}",
+            "tenant": "={{ $('Credenciais').item.json.referencias.tenant_domain }}",
+            "matricula": "={{$('DEPEND').item.json.CHAPA}}",
+            "nrdependente": "={{$('DEPEND').item.json.NRODEPEND || ''}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "erro",
+              "displayName": "erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "matricula",
+              "displayName": "matricula",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tenant",
+              "displayName": "tenant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nrdependente",
+              "displayName": "nrdependente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        352
+      ],
+      "id": "02b3723e-ef18-4da2-82b8-7852f9cab60a",
+      "name": "Insert row"
+    }
+  ],
+  "connections": {
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEPEND": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para - Depend": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PFUNC": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "DEPEND",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ESTADOCIVIL": {
+      "main": [
+        [
+          {
+            "node": "SEXO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "ESTADOCIVIL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RabbitMQ1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEXO": {
+      "main": [
+        [
+          {
+            "node": "GRAUPARENTESCO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GRAUPARENTESCO": {
+      "main": [
+        [
+          {
+            "node": "De Para - Depend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2fac4cfd-38d5-4c25-9a9f-0f14408db4d2",
+  "activeVersionId": "2fac4cfd-38d5-4c25-9a9f-0f14408db4d2",
+  "versionCounter": 6,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-13T18:14:59.769Z",
+      "createdAt": "2025-10-13T18:14:59.769Z",
+      "role": "workflow:owner",
+      "workflowId": "xIPGGkhqdUvPJvQ2",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
