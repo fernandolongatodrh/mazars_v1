@@ -1,0 +1,101 @@
+{
+  "updatedAt": "2025-10-15T12:12:47.519Z",
+  "createdAt": "2025-10-13T18:11:12.289Z",
+  "id": "CvW7MAWWjeGeAfIq",
+  "name": "PRD - Carga - Colaboradores",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b229222e-0d2f-468b-b4bd-4c3977d85a71",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b27c21b-0e60-4589-865f-746cdc6fea5e",
+      "name": "Webhook",
+      "webhookId": "b229222e-0d2f-468b-b4bd-4c3977d85a71"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Colaboradores_Carga",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "36de3ed5-a3ec-4b52-beb9-ed02d490765e",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "73ca2728-c59e-4251-9f1b-dcdd7f01f969",
+  "activeVersionId": "73ca2728-c59e-4251-9f1b-dcdd7f01f969",
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-13T18:11:12.289Z",
+      "createdAt": "2025-10-13T18:11:12.289Z",
+      "role": "workflow:owner",
+      "workflowId": "CvW7MAWWjeGeAfIq",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
