@@ -1,0 +1,1271 @@
+{
+  "updatedAt": "2026-02-05T18:16:46.559Z",
+  "createdAt": "2025-10-13T18:13:50.318Z",
+  "id": "DS3G8ECOXZYH7xza",
+  "name": "PRD - Colaboradores - 2 - Consome Fila Funcionario",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"referencias\": {\n    \"tarefa_id\": \"{{ $json.referencias.tarefa_id }}\",\n    \"tenant_id\": \"{{ $json.referencias.tenant_id }}\",\n    \"tenant_nome\": \"{{ $json.referencias.tenant_nome }}\",\n    \"tenant_domain\": \"{{ $json.referencias.tenant_domain }}\",\n    \"tenant_schema\": \"{{ $json.referencias.tenant_schema }}\"\n  },\n  \"sistema_origem\": {\n    \"servidor\": \"{{ $json.sistema_origem.servidor }}\",\n    \"porta_soap\":{{ $json.sistema_origem.porta_soap }},\n    \"porta_rest\": {{ $json.sistema_origem.porta_rest }},\n    \"autorizacao\": \"{{ $json.sistema_origem.autorizacao }}\",\n    \"coligada\": {{ $json.sistema_origem.coligada }}\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3584,
+        -336
+      ],
+      "id": "bdc76224-e43f-4c08-bfed-1827cc245fb0",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Credenciais').item.json.sistema_origem.servidor }}:{{ $('Credenciais').item.json.sistema_origem.porta_rest}}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_PESSOA/0/P?parameters=CODPESSOA%3D{{ $('PFUNC').item.json.CODPESSOA }}%3BDATAMOD%3D{{  $('Credenciais').item.json.sistema_origem.datamod ?? '19000101' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.sistema_origem.autorizacao }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "109bf2a2-4618-4d57-bbbe-eafe5e9d2922",
+      "name": "PPESSOA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2912,
+        -272
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/funcionario/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Code1').item.json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -416
+      ],
+      "id": "722f77e5-c73f-434c-90f0-0e9c5e8a3160",
+      "name": "HTTP Request6",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id_origem\": \"{{$('PPESSOA').item.json.CODIGO}}\",\n  \"nome\": \"{{$('PPESSOA').item.json.NOME.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_nascimento\": \"{{ $('PPESSOA').item.json.DTNASCIMENTO.split('T')[0]}}\",\n  \"estado_natal\": \"{{ $('PPESSOA').item.json.ESTADONATAL.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"naturalidade\": \"{{ $('PPESSOA').item.json.NATURALIDADE.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"apelido\": \"{{ $('PPESSOA').item.json.APELIDO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"estado_civil\": {{ $('ESTADO_CIVIL').item.json.registros[0].id }},\n  \"sexo\": {{ $('SEXO').item.json.registros[0].id }},\n  \"nacionalidade\": \"{{ $('PPESSOA').item.json.NACIONALIDADE.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"rua\": \"{{ $('PPESSOA').item.json.RUA.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"numero\": \"{{ $('PPESSOA').item.json.NUMERO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"complemento\": \"{{ $('PPESSOA').item.json.COMPLEMENTO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"bairro\": \"{{ $('PPESSOA').item.json.BAIRRO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"estado\": \"{{ $('PPESSOA').item.json.ESTADO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"cidade\": \"{{ $('PPESSOA').item.json.CIDADE.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"cep\": \"{{ $('PPESSOA').item.json.CEP.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"pais\": \"{{ $('PPESSOA').item.json.PAIS.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"cpf\": \"{{ $('PPESSOA').item.json.CPF.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"email\": \"{{ $('PPESSOA').item.json.EMAIL.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"registro_profissional\": \"{{ $('PPESSOA').item.json.REGPROFISSIONAL.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"telefone1\": \"{{ $('PPESSOA').item.json.TELEFONE1.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"telefone2\": \"{{ $('PPESSOA').item.json.TELEFONE2.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"identidade\": \"{{ $('PPESSOA').item.json.TELEFONE3.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"uf_identidade\": \"{{ $('PPESSOA').item.json.UFCARTIDENT.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"orgao_emissor_ident\": \"{{ $('PPESSOA').item.json.ORGEMISSORIDENT.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_emissao_ident\": \"{{ $('PPESSOA').item.json.DTEMISSAOIDENT.split('T')[0] }}\",\n  \"titulo_eleitor\": \"{{ $('PPESSOA').item.json.TITULOELEITOR.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"zona_titulo_eleitor\": \"{{ $('PPESSOA').item.json.ZONATITELEITOR.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"secao_titulo_eleitor\": \"{{ $('PPESSOA').item.json.SECAOTITELEITOR.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"carteira_trabalho\": \"{{ $('PPESSOA').item.json.CARTEIRATRAB.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"serie_carteira_trab\": \"{{ $('PPESSOA').item.json.SERIECARTTRAB.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"uf_carteira_trab\": \"{{ $('PPESSOA').item.json.UFCARTTRAB.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_emissao_ctps\": \"{{ $json.DTCARTTRAB.split('T')[0] }}\",\n  \"nit\": \"{{ $('PPESSOA').item.json.NIT.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"carteira_motorista\": \"{{ $('PPESSOA').item.json.CARTMOTORISTA.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"tipo_carteira_habilit\": \"{{ $('PPESSOA').item.json.TIPOCARTHABILIT.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_venc_habilit\": \"{{ $('PPESSOA').item.json.DTVENCHABILIT.split('T')[0] }}\",\n  \"certificado_reservista\": \"{{ $('PPESSOA').item.json.CERTIFRESERV.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"naturalizado\": \"N\",\n  \"data_venc_ctps\": \"{{ $('PPESSOA').item.json.DTVENCHABILIT.split('T')[0] }}\",\n  \"tipo_visto\": \"{{ $('PPESSOA').item.json.TIPOVISTO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"email_pessoal\": \"{{ $('PPESSOA').item.json.EMAILPESSOAL.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"cor_raca\": {{ $('COR').item.json.registros[0].id }},\n  \"deficiente_fisico\": \"N\",\n  \"telefone3\": \"{{ $('PPESSOA').item.json.TELEFONE3.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"numero_passaporte\": \"{{ $('PPESSOA').item.json.NPASSAPORTE.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"pais_origem\": \"{{ $('PPESSOA').item.json.PAISORIGEM.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_emissao_passaporte\": \"{{ $('PPESSOA').item.json.DTEMISSPASSAPORTE.split('T')[0]}}\",\n  \"data_validade_passaporte\": \"{{ $('PPESSOA').item.json.DTVALPASSAPORTE.split('T')[0]}}\",\n  \"observacoes_pessoa\": \"{{ $('PPESSOA').item.json.OBSPESSOA.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"codigo_municipio\": \"{{ $('PPESSOA').item.json.CODMUNICIPIO.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"circunscricao_militar\": null,\n  \"orgao_expedicao\": null,\n  \"regiao_militar\": null,\n  \"situacao_militar\": null,\n  \"data_titulo_eleitor\": \"{{ $('PPESSOA').item.json.DTTITELEITOR.split('T')[0] }}\",\n  \"estado_emissor_tit_eleitor\": \"{{ $('PPESSOA').item.json.ESTELEIT.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"tipo_sanguineo\": \"{{ $('PPESSOA').item.json.TIPOSANG.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"id_biometria\": null,\n  \"imagem\": null,\n  \"primeiro_nome\": \"{{ $('PPESSOA').item.json.PRIMEIRONOME.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"sobrenome_pai\": \"{{ $('PPESSOA').item.json.SOBRENOMEPAI.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"sobrenome_mae\": \"{{ $('PPESSOA').item.json.SOBRENOMEMAE.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"uf_registro_profissional\": \"{{ $('PPESSOA').item.json.UFCARTTRAB.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\",\n  \"data_emissao_cnh\": \"{{ $('PPESSOA').item.json.DTEMISSAOCNH.split('T')[0] }}\",\n  \"data_naturalizacao\": \"{{ $('PPESSOA').item.json.DATANATURALIZACAO.split('T')[0] }}\",\n  \"id_pais\": \"1\", \n  \"nome_social\": \"{{ $('PPESSOA').item.json.NOMESOCIAL.replace(/[^\\p{L}\\p{N}\\s@._\\-]/gu, '').replace(/\\s+/g, ' ').trim()}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1792,
+        -272
+      ],
+      "id": "de688056-9ea0-4801-98e9-399a67bb1187",
+      "name": "De Para - Pessoa Fisica"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"pessoa_fisica\": {{ $('Code').item.json.dados }},\n  \"created_at\": \"{{ $('PFUNC').item.json.RECCREATEDON.split('T')[0].trim() }}\",\n  \"updated_at\": \"{{ $('PFUNC').item.json.RECMODIFIEDON.split('T')[0].trim() }}\",\n  \"chapa\": \"{{ $('PFUNC').item.json.CHAPA.trim() }}\",\n  \"codigo_ficha_registro\": null,\n  \"dt_situacao\": null,\n  \"tipo_admissao\": \"{{ $('TIPOADMISSAO').item.json.registros[0].id }}\",\n  \"dt_admissao\": \"{{ $('PFUNC').item.json.DATAADMISSAO.split('T')[0].trim() }}\",\n  \"tipo_demissao\": {{ $('TIPODEMISSAO').item.json.registros[0]?.id ?? null}},\n  \"dt_demissao\": \"{{ $('PFUNC').item.json.DATADEMISSAO?.split('T')[0].trim() ?? null}}\",\n  \"dt_transferencia\": \"{{ $('PFUNC').item.json.DTTRANSFERENCIA?.split('T')[0].trim() ?? null }}\",\n  \"departamento\": null,\n  \"secao_origem_id\": \"{{ $('PFUNC').item.json.CODSECAO.trim() }}\",\n  \"centro_custo_origem_id\": \"{{ $('PFUNC').item.json.CODCCUSTO.trim() }}\",\n  \"salario\": \"{{ $('PFUNC').item.json.SALARIO.toString().trim() }}\",\n  \"codigo_jornada\": \"{{ $('PFUNC').item.json.CODHORARIO.trim() }}\",\n  \"agencia\": \"{{ $('PFUNC').item.json.CODAGENCIAPAGTO.trim() }}\",\n  \"conta_corrente\": \"{{ $('PFUNC').item.json.CONTAPAGAMENTO.trim() }}\",\n  \"pix\": null,\n  \"status_beneficios\": null,\n  \"filial_origem_id\": \"{{ $('PFUNC').item.json.CODFILIAL }}\",\n  \"funcao_origem_id\": \"{{ $('PFUNC').item.json.CODFUNCAO.trim() }}\",\n  \"banco\": \"{{ $('PFUNC').item.json.CODBANCOPAGTO.trim() }}\",\n  \"tipo_funcionario\": {{ $('TIPOFUNCIONARIO').item.json.registros[0].id }},\n  \"tipo_situacao\": {{ $('SITUACAO').item.json.registros[0].id }},\n  \"pispasep\": \"{{ $('PFUNC').item.json.PISPASEP.trim() }}\",\n  \"grau_instrucao\": {{ $('GRAU_INSTRUCAO').item.json.registros[0].id }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        -272
+      ],
+      "id": "1ec796b0-c796-4122-86fe-015ef40fdb96",
+      "name": "De Para - Funcionário"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = (item.json[key] === \"null\" || item.json[key] === \"undefined\") ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -272
+      ],
+      "id": "64157960-7cd3-4078-9aa9-7d4372e358b1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = (item.json[key] === \"null\" || item.json[key] === \"undefined\") ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        -272
+      ],
+      "id": "c39a2815-5a0c-4d30-b733-7ca51ec857fb",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Colaboradores_PFUNC",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          },
+          "jsonParseBody": true,
+          "onlyContent": true,
+          "parallelMessages": 50
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3808,
+        -432
+      ],
+      "id": "9ccc8992-431e-4055-9797-a9eefe472817",
+      "name": "PFUNC",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.referencias.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3360,
+        -272
+      ],
+      "id": "942a9708-733e-4e4d-bd22-2f2b6b2e2342",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"CHAPA\": \"{{ $json.chapa }}\",\n  \"CODCOLIGADA\": {{ $('Credenciais').item.json.sistema_origem.coligada }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -368
+      ],
+      "id": "1da5ee37-2821-4207-b85e-4bc7b65413dd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Dependentes_PFDEPEND",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        -432
+      ],
+      "id": "d5275602-5e7b-473a-87a4-d68b25535a83",
+      "name": "EnviaDependente",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        -432
+      ],
+      "id": "96107d0c-e045-4a0f-a549-5d9e8a082f36",
+      "name": "LimpaFila",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3808,
+        -240
+      ],
+      "id": "4cb85dae-658f-4a5c-8108-138890d74137",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/cor_raca/?id_origem={{ $json.CORRACA }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2688,
+        -272
+      ],
+      "id": "eb475f4a-e4db-418b-962c-8d9a7097990f",
+      "name": "COR"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/estado_civil/?id_origem={{ $('PPESSOA').item.json.ESTADOCIVIL.toUPPERCase()}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2464,
+        -272
+      ],
+      "id": "dafe151d-9634-40f8-8a30-3d32f06968a9",
+      "name": "ESTADO_CIVIL"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/tipo_situacao/?id_origem={{ $('PFUNC').item.json.CODSITUACAO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1120,
+        -272
+      ],
+      "id": "aa125b13-e403-454c-adcd-b72cf330b82f",
+      "name": "SITUACAO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/tipo_funcionario/?id_origem={{ $('PFUNC').item.json.CODTIPO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1344,
+        -272
+      ],
+      "id": "468be804-cbf4-4311-b9a6-dce8d25b3409",
+      "name": "TIPOFUNCIONARIO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/genero/?id_origem={{ $('PPESSOA').item.json.SEXO.toUPPERCase() }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2016,
+        -272
+      ],
+      "id": "34a5c748-cead-4628-8172-3a50410810d3",
+      "name": "SEXO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/tipo_admissao/?id_origem={{ $('PFUNC').item.json.TIPOADMISSAO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -896,
+        -272
+      ],
+      "id": "30570329-9a5e-48a0-b276-5db888d9aac3",
+      "name": "TIPOADMISSAO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/tipo_demissao/?id_origem={{ $('PFUNC').item.json.TIPODEMISSAO ?? \"null\" }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        -272
+      ],
+      "id": "be695bea-2de0-4113-936e-33b339ec04ae",
+      "name": "TIPODEMISSAO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a3a082d0-e310-4bb2-ac37-464214358b9c",
+              "leftValue": "={{ $('PESQUISA_CHAPA').item.json.chapa }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -272
+      ],
+      "id": "841d84cb-1169-4b65-b3d9-d60ddd18ab50",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/funcionario/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "chapa",
+              "value": "={{ $('PFUNC').item.json.CHAPA }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3136,
+        -272
+      ],
+      "id": "fb433698-cf07-422f-af14-99e011b00352",
+      "name": "PESQUISA_CHAPA",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/funcionario/{{ $('PESQUISA_CHAPA').item.json.id }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.dados }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -128
+      ],
+      "id": "27d6e080-bfec-46de-ab19-5b61d641b7ab",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        -432
+      ],
+      "id": "87a43f56-d85a-4502-8759-4d5569168824",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "PMicr7D1jaT1awNz",
+          "mode": "list",
+          "cachedResultName": "error_colaboradores",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/PMicr7D1jaT1awNz"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "erro": "={{ $json.error.message.split(' - ')[1].replaceAll(/[{}[\\]\"\\\\]/g, ' ').trim() }}",
+            "tenant": "={{ $('Credenciais').item.json.referencias.tenant_domain }}",
+            "matricula": "={{ $('PFUNC').item.json.CHAPA }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "erro",
+              "displayName": "erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tenant",
+              "displayName": "tenant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "matricula",
+              "displayName": "matricula",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "479a8135-3cb7-4662-9508-ac32b9b199fe",
+      "name": "Insert row1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "wi2s3S4smzmjMbPi",
+          "mode": "list",
+          "cachedResultName": "sincronimos_base",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/wi2s3S4smzmjMbPi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant",
+              "keyValue": "={{ $json.tenant }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "total_funcionario": "={{ $json.total_funcionario}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant",
+              "displayName": "tenant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "numero_processo",
+              "displayName": "numero_processo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "total_funcionario",
+              "displayName": "total_funcionario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total_erro",
+              "displayName": "total_erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -432
+      ],
+      "id": "bacb8c42-3600-4393-9c9b-9d453a3165c1",
+      "name": "contrador_sucesso"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "wi2s3S4smzmjMbPi",
+          "mode": "list",
+          "cachedResultName": "sincronimos_base",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/wi2s3S4smzmjMbPi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant",
+              "keyValue": "={{ $('Credenciais').item.json.referencias.tenant_schema }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -432
+      ],
+      "id": "3ff0c66c-f210-402c-bf18-2ceb05804dac",
+      "name": "consulta"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "wi2s3S4smzmjMbPi",
+          "mode": "list",
+          "cachedResultName": "sincronimos_base",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/wi2s3S4smzmjMbPi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant",
+              "keyValue": "={{ $('Credenciais').item.json.referencias.tenant_schema }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -176
+      ],
+      "id": "64ef7f01-fcd7-4d74-8d58-4f271206c9ff",
+      "name": "consulta2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "wi2s3S4smzmjMbPi",
+          "mode": "list",
+          "cachedResultName": "sincronimos_base",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/wi2s3S4smzmjMbPi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant",
+              "keyValue": "={{ $json.tenant }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "total_erro": "={{ $json.total_erro +1}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant",
+              "displayName": "tenant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "numero_processo",
+              "displayName": "numero_processo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "total_funcionario",
+              "displayName": "total_funcionario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "total_erro",
+              "displayName": "total_erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -176
+      ],
+      "id": "6695c239-2cfe-456c-ba3e-209af3e819f4",
+      "name": "contrador_erro"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        -176
+      ],
+      "id": "055054ec-0ea3-49c0-ac02-409aaf407384",
+      "name": "LimpaFila1",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/grau_instrucao/?id_origem={{ $('PPESSOA').item.json.GRAUINSTRUCAO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2240,
+        -272
+      ],
+      "id": "8f1cbaae-da80-4941-93f2-c15081db5777",
+      "name": "GRAU_INSTRUCAO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/centro_custo/?id_origem={{ $('PFUNC').item.json.CODCCUSTO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1008,
+        -96
+      ],
+      "id": "43a36fc5-cde4-4ab9-b0ba-206addfe959b",
+      "name": "CENTROCUSTO",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "PPESSOA": {
+      "main": [
+        [
+          {
+            "node": "COR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para - Pessoa Fisica": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para - Funcionário": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "TIPOFUNCIONARIO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PFUNC": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "PESQUISA_CHAPA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviaDependente": {
+      "main": [
+        [
+          {
+            "node": "LimpaFila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "COR": {
+      "main": [
+        [
+          {
+            "node": "ESTADO_CIVIL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ESTADO_CIVIL": {
+      "main": [
+        [
+          {
+            "node": "GRAU_INSTRUCAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SITUACAO": {
+      "main": [
+        [
+          {
+            "node": "TIPOADMISSAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIPOFUNCIONARIO": {
+      "main": [
+        [
+          {
+            "node": "SITUACAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEXO": {
+      "main": [
+        [
+          {
+            "node": "De Para - Pessoa Fisica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIPOADMISSAO": {
+      "main": [
+        [
+          {
+            "node": "TIPODEMISSAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIPODEMISSAO": {
+      "main": [
+        [
+          {
+            "node": "De Para - Funcionário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PESQUISA_CHAPA": {
+      "main": [
+        [
+          {
+            "node": "PPESSOA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "EnviaDependente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row1": {
+      "main": [
+        [
+          {
+            "node": "consulta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LimpaFila": {
+      "main": [
+        [
+          {
+            "node": "consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consulta": {
+      "main": [
+        [
+          {
+            "node": "contrador_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consulta2": {
+      "main": [
+        [
+          {
+            "node": "contrador_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contrador_erro": {
+      "main": [
+        [
+          {
+            "node": "LimpaFila1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GRAU_INSTRUCAO": {
+      "main": [
+        [
+          {
+            "node": "SEXO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CENTROCUSTO": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6ed36af9-de57-415f-9936-7aa23f6f4758",
+  "activeVersionId": "6ed36af9-de57-415f-9936-7aa23f6f4758",
+  "versionCounter": 16,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-13T18:13:50.318Z",
+      "createdAt": "2025-10-13T18:13:50.318Z",
+      "role": "workflow:owner",
+      "workflowId": "DS3G8ECOXZYH7xza",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
