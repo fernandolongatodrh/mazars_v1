@@ -1,0 +1,101 @@
+{
+  "updatedAt": "2025-10-18T20:47:28.102Z",
+  "createdAt": "2025-10-18T20:44:22.220Z",
+  "id": "QNkM8IjroFnkWIpd",
+  "name": "Carga inicial férias",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e03cd8d0-b01c-4b00-af2a-5efc6275fef7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fb1b40a7-8786-4852-87b1-2c7ef937d50b",
+      "name": "Webhook",
+      "webhookId": "e03cd8d0-b01c-4b00-af2a-5efc6275fef7"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_feriasaberto",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "9024907c-fa80-4bf1-aefc-e24c61e3fb6e",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3be49aa0-0584-4071-940f-e40497313bbe",
+  "activeVersionId": "3be49aa0-0584-4071-940f-e40497313bbe",
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-18T20:44:22.220Z",
+      "createdAt": "2025-10-18T20:44:22.220Z",
+      "role": "workflow:owner",
+      "workflowId": "QNkM8IjroFnkWIpd",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
