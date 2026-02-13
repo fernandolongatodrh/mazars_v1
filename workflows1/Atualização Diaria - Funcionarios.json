@@ -1,0 +1,235 @@
+{
+  "updatedAt": "2026-02-06T18:29:53.533Z",
+  "createdAt": "2025-10-28T19:31:44.644Z",
+  "id": "LLV2zm7NKHkATuYF",
+  "name": "Atualização Diaria - Funcionarios",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            },
+            {
+              "triggerAtHour": 4
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "7c89a802-2f2d-4053-b371-196a06b30477",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://s000dirhect.mazars.com.br/api/client_tenant/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        16
+      ],
+      "id": "ad1b028e-11f6-4a71-b902-afc76379614b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://s000dirhect.mazars.com.br/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        16
+      ],
+      "id": "8e280628-73da-4a2b-b634-6cce3919c3fa",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "777cc057-5bc7-4d38-844d-07d68b1eb6c7",
+              "leftValue": "={{ $json.schema_name }}",
+              "rightValue": "S",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        16
+      ],
+      "id": "ffb633ba-c775-4dd5-bce2-7cbd6699de04",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\"body\":{\n\"referencias\": {\n\"tarefa_id\": \"000000\",\n\"tenant_id\": \"{{ $json.id }}\",\n\"tenant_nome\": \"{{ $json.nome }}\",\n\"tenant_domain\": \"{{ $json.schema_name.toLowerCase() }}dirhect.mazars.com.br\",\n\"tenant_schema\": \"{{ $json.schema_name }}\"\n},\n\"sistema_origem\": {\n\"servidor\": \"https://172.16.60.23\",\n\"porta_soap\": 8051,\n\"porta_rest\": 8051,\n\"autorizacao\": \"Basic bWVzdHJlOkZNQDIwMjQ=\",\n\"coligada\": {{ $json.schema_name.replaceAll('S','').toNumber() }}\n},\n  \"data_modificacao\": \"{{ new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0] }}\"\n\n} }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        16
+      ],
+      "id": "7d379aca-b565-406a-9181-6318405fcc16",
+      "name": "Edit Fields",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Colaboradores_Carga",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "c2d48ed7-6915-4493-8a16-5ac8d4040fa9",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cf159d18-1c67-44c0-96fc-e9719d8d5004",
+  "activeVersionId": "cf159d18-1c67-44c0-96fc-e9719d8d5004",
+  "versionCounter": 9,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-10-28T19:31:44.644Z",
+      "createdAt": "2025-10-28T19:31:44.644Z",
+      "role": "workflow:owner",
+      "workflowId": "LLV2zm7NKHkATuYF",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
