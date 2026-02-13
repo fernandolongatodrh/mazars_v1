@@ -1,0 +1,1813 @@
+{
+  "updatedAt": "2026-02-11T14:26:36.431Z",
+  "createdAt": "2025-07-26T02:24:21.344Z",
+  "id": "2jP88TlmlvvwlmAN",
+  "name": "Solicitar Admissao",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        1392
+      ],
+      "id": "f67fbee3-b55a-4945-9be7-082ee7d1f9d3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "=<FopFunc>\n  <PFUNC>\n    <CODUSUARIO>null</CODUSUARIO>\n    <CODPESSOA>{{ $('READMISSAO').item.json.CODIGO }}</CODPESSOA>\n    <CODIGO>{{ $('READMISSAO').item.json.CODIGO }}</CODIGO>\n    <CHAPA>{{ $('CHAPA').item.json.CHAPA }}</CHAPA>\n    <NROFICHAREG>{{ isNaN($('CHAPA').item.json.CHAPA) ? Number($('CHAPA').item.json.CHAPA.replace(/\\D/g, '')) : $('CHAPA').item.json.CHAPA }}</NROFICHAREG>\n    <CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n    <CODRECEBIMENTO>{{ $('Admissao').item.json.tipo_recebimento.id_origem }}</CODRECEBIMENTO>\n    <CODSITUACAO>{{ $('Admissao').item.json.tipo_situacao.id_origem }}</CODSITUACAO>\n    <CODTIPO>{{ $('Admissao').item.json.tipo_funcionario.id_origem }}</CODTIPO>\n    <CODSECAO>{{ $('Admissao').item.json.secao_id_origem }}</CODSECAO>\n    <CODCCUSTO>{{ $('CentroCusto').item.json.cc_origem }}</CODCCUSTO>\n    <CODFUNCAO>{{ $('Admissao').item.json.funcao_id_origem }}</CODFUNCAO>\n    <CODSINDICATO>{{ $('Admissao').item.json.sindicato_id_origem }}</CODSINDICATO>\n    <CODHORARIO>{{ $('Admissao').item.json.horario_id_origem }}</CODHORARIO>\n    <DTBASE>{{ $('Admissao').item.json.dt_admissao }}</DTBASE>\n    <SALARIO>{{ $('Admissao').item.json.salario }}</SALARIO>      \n    <DATAADMISSAO>{{ $('Admissao').item.json.dt_admissao }}</DATAADMISSAO>\n    <TIPOADMISSAO>{{ $('Admissao').item.json.tipo_admissao.id_origem }}</TIPOADMISSAO>\n    <MOTIVOADMISSAO>{{ $('Admissao').item.json.motivo_admissao.id_origem }}</MOTIVOADMISSAO>       \n    <CONTAPAGAMENTO>{{ $('Admissao').item.json.conta_corrente }}</CONTAPAGAMENTO>   \n    <CODFILIAL>{{ $('Admissao').item.json.filial_id_origem }}</CODFILIAL>\n    <NOME>{{ $('Admissao').item.json.nome.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase() }}</NOME> \n    <CODBANCOPAGTO>{{ $('Admissao').item.json.banco }}</CODBANCOPAGTO>\n    <CODAGENCIAPAGTO>{{ $('Admissao').item.json.agencia_nova ? $('Admissao').item.json.agencia_nova : $('Admissao').item.json.num_agencia }}</CODAGENCIAPAGTO>    \n    <CODOCORRENCIA>{{ $('Admissao').item.json.codigo_ocorrencia_sefip.id_origem }}</CODOCORRENCIA>\n    <CODCATEGORIA>{{ $('Admissao').item.json.codigo_categoria_sefip.id_origem }}</CODCATEGORIA>    \n    <SEXO>{{ $('Admissao').item.json.genero.id_origem }}</SEXO>\n    <NACIONALIDADE>{{ $('Admissao').item.json.nacionalidade }}</NACIONALIDADE>\n    <GRAUINSTRUCAO>{{ $('Admissao').item.json.grau_instrucao.id_origem }}</GRAUINSTRUCAO>\n    <NATURALIDADE>{{ $('Admissao').item.json.naturalidade }}</NATURALIDADE>\n    <APELIDO>{{ $('Admissao').item.json.apelido }}</APELIDO>\n    <EMAIL>{{ $('Admissao').item.json.email }}</EMAIL>\n    <DTNASCIMENTO>{{ $('Admissao').item.json.dt_nascimento }}</DTNASCIMENTO>\n    <CARTIDENTIDADE>{{ $('Admissao').item.json.identidade }}</CARTIDENTIDADE>   \n    <UFCARTIDENT>{{ $('Admissao').item.json.uf_identidade }}</UFCARTIDENT>\n    <CARTEIRATRAB>{{ $('Admissao').item.json.carteira_trabalho }}</CARTEIRATRAB>\n    <SERIECARTTRAB>{{ $('Admissao').item.json.serie_carteira_trab }}</SERIECARTTRAB>\n    <UFCARTTRAB>{{ $('Admissao').item.json.uf_carteira_trab }}</UFCARTTRAB>\n    <TITULOELEITOR>{{ $('Admissao').item.json.titulo_eleitor }}</TITULOELEITOR>\n    <SECAOTITELEITOR>{{ $('Admissao').item.json.secao_titulo_eleitor }}</SECAOTITELEITOR>\n    <ZONATITELEITOR>{{ $('Admissao').item.json.zona_titulo_eleitor }}</ZONATITELEITOR>\n    <CERTIFRESERV>{{ $('Admissao').item.json.certificado_reservista }}</CERTIFRESERV>    \n    <CARTMOTORISTA>{{ $('Admissao').item.json.carteira_motorista }}</CARTMOTORISTA>\n    <TIPOCARTHABILIT>{{ $('Admissao').item.json.tipo_carteira_habilit }}</TIPOCARTHABILIT>\n    <DTVENCHABILIT>{{ $('Admissao').item.json.data_venc_habilit }}</DTVENCHABILIT>\n    <CPF>{{ $('Admissao').item.json.cpf }}</CPF>\n    <REGPROFISSIONAL>{{ $('Admissao').item.json.registro_profissional }}</REGPROFISSIONAL>\n    <RUA>{{ $('Admissao').item.json.rua.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase() }}</RUA>\n    <NUMERO>{{ $('Admissao').item.json.numero }}</NUMERO>\n    <COMPLEMENTO>{{ $('Admissao').item.json.complemento.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()}}</COMPLEMENTO>\n    <BAIRRO>{{ $('Admissao').item.json.bairro.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</BAIRRO>\n    <CIDADE>{{ $('Admissao').item.json.cidade.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</CIDADE>\n    <ESTADO>{{ $('Admissao').item.json.estado }}</ESTADO>\n    <PAIS>{{ $('Admissao').item.json.pais_nome }}</PAIS>\n    <CEP>{{ $('Admissao').item.json.cep }}</CEP>\n    <TELEFONE1>{{ $('Admissao').item.json.ddd }}{{ $('Admissao').item.json.telefone }}</TELEFONE1>\n    <TELEFONE2>{{ $('Admissao').item.json.ddd1 }}{{ $('Admissao').item.json.telefone1 }}</TELEFONE2>\n    <TELEFONE3>{{ $('Admissao').item.json.ddd2 }}{{ $('Admissao').item.json.telefone2 }}</TELEFONE3>\n    <NOMEBANCOPGTO>{{ $('Admissao').item.json.banco }}</NOMEBANCOPGTO>\n    <NOMEPAI>{{ $('Admissao').item.json.nome_pai }}</NOMEPAI>\n    <NOMEMAE>{{ $('Admissao').item.json.nome_mae }}</NOMEMAE>\n    <PISPASEP>{{ $('Admissao').item.json.pispasep.replace(/\\D/g, '') }}</PISPASEP>\n    <ESOCIALNATATIVIDADE>{{ $('Admissao').item.json.natureza_atividade_esocial }}</ESOCIALNATATIVIDADE>\n    <TEMPOPARCIAL>{{ $('Admissao').item.json.contrato_tempo_parcial }}</TEMPOPARCIAL>\n    <SITUACAOFGTS>{{$('Admissao').item.json.codigo_situacao_fgts.id_origem }}</SITUACAOFGTS>\n    <ORGEMISSORIDENT>{{ $('Admissao').item.json.orgao_emissor_ident }}</ORGEMISSORIDENT>\n    <DTEMISSAOIDENT>{{ $('Admissao').item.json.data_emissao_ident }}</DTEMISSAOIDENT>\n    <ESTELEIT>{{ $('Admissao').item.json.estado_emissor_tit_eleitor }}</ESTELEIT>\n    <DTCARTRAB>{{ $('Admissao').item.json.data_emissao_ctps }}</DTCARTRAB>\n  <NPASSAPORTE>{{ $('Admissao').item.json.numero_passaporte }}</NPASSAPORTE>\n <DTEMISSPASSAPORTE>{{ $('Admissao').item.json.data_emissao_passaporte }}</DTEMISSPASSAPORTE>\n<DTVALPASSAPORTE>{{ $('Admissao').item.json.data_validade_passaporte }}</DTVALPASSAPORTE>\n<PAISORIGEM>{{ $('Admissao').item.json.pais_origem }}</PAISORIGEM>\n<OPBANCARIA>{{ $('Admissao').item.json.conta_operacao }}</OPBANCARIA>\n\n    <JORNADA_MENSAL>{{ \n  (() => {\n    const jornada = $('Admissao').item.json.jornada; // exemplo: \"123:45\"\n    if (!jornada || !jornada.includes(\":\")) return 0;\n    const [horas, minutos] = jornada.split(\":\").map(Number);\n    return (horas * 60) + minutos;\n  })()\n}}</JORNADA_MENSAL>\n    <JORNADAMENSAL>{{ \n  (() => {\n    const jornada = $('Admissao').item.json.jornada; // exemplo: \"123:45\"\n    if (!jornada || !jornada.includes(\":\")) return 0;\n    const [horas, minutos] = jornada.split(\":\").map(Number);\n    return (horas * 60) + minutos;\n  })()\n}}</JORNADAMENSAL>\n    <SITUACAOINSS>{{ $('Admissao').item.json.calcula_inss ? 1 : 0 }}</SITUACAOINSS>\n    <SITUACAOIRRF>{{ $('Admissao').item.json.calcula_irrf ? 1 : 0}}</SITUACAOIRRF>\n    <SITUACAORAIS>N</SITUACAORAIS>\n    \n    <DEFICIENTEFISICO>{{ $('Admissao').item.json.deficiente_fisico == true ? 1 : 0 }}</DEFICIENTEFISICO> \n    <CORRACA>{{ $('Admissao').item.json.cor_raca }}</CORRACA>\n    <ESTADOCIVIL>{{ $('Admissao').item.json.estado_civil.id_origem }}</ESTADOCIVIL>\n    <ESTADONATAL>{{ $('Admissao').item.json.estado_natal }}</ESTADONATAL>\n    <TPCONTABANCARIA>{{ $('Admissao').item.json.tipo_conta === 'C' ? 1 : $('Admissao').item.json.tipo_conta === 'P' ? 2 : $('Admissao').item.json.tipo_conta === 'S' ? 3 : 'null' }}</TPCONTABANCARIA>\n    <TPREGIMEPREV>{{ $('Admissao').item.json.tipo_regime_previdenciario }}</TPREGIMEPREV>    \n    <INDADMISSAO>{{ $('Admissao').item.json.indicativo_admissao }}</INDADMISSAO>\n    <CODMUNICIPIO>{{ $('Admissao').item.json.codigo_municipio }}</CODMUNICIPIO>\n    <DTEMISSAOCNH>{{ $('Admissao').item.json.data_emissao_cnh }}</DTEMISSAOCNH>\n    \n    <TIPOREGIMEJORNADA>{{ $('Admissao').item.json.tipo_regime_jornada }}</TIPOREGIMEJORNADA>\n    <TIPOREGIMETRABALHISTA>{{ $('Admissao').item.json.tipo_regime_trabalhista }}</TIPOREGIMETRABALHISTA>\n    <IDADE>{{  $('Admissao').item.json.dt_nascimento   ? (\n        (new Date().getMonth() < new Date($('Admissao').item.json.dt_nascimento).getMonth() ||\n        (new Date().getMonth() === new Date($('Admissao').item.json.dt_nascimento).getMonth() &&\n        new Date().getDate() < new Date($('Admissao').item.json.dt_nascimento).getDate()))\n          ? (new Date().getFullYear() - new Date($('Admissao').item.json.dt_nascimento).getFullYear() - 1)\n          : (new Date().getFullYear() - new Date($('Admissao').item.json.dt_nascimento).getFullYear())\n      )    : null}}</IDADE>\n    \n    <CODCATEGORIAESOCIAL>{{ $('Admissao').item.json.codigo_categoria_esocial.id_origem }}</CODCATEGORIAESOCIAL>\n    <DTTITELEITOR>{{ $('Admissao').item.json.data_titulo_eleitor }}</DTTITELEITOR>  \n    <SITMILITAR>{{ $('Admissao').item.json.situacao_militar }}</SITMILITAR>\n   <INDINICIOHOR>{{ $('Admissao').item.json.horario_indice }}</INDINICIOHOR>\n    <PRIMEIRONOME>{{ $('Admissao').item.json.nome.split(' ')[0]\n.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</PRIMEIRONOME>\n   \n    <SOBRENOMEPAI>{{ $('Admissao').item.json.sobrenome_pai }}</SOBRENOMEPAI>\n    <SOBRENOMEMAE>{{ $('Admissao').item.json.sobrenome_mae }}</SOBRENOMEMAE>\n\n    <CODUFREGISTRO>{{ $('Admissao').item.json.uf_registro_profissional }}</CODUFREGISTRO>\n   \n    <NOMESOCIAL>{{ $('Admissao').item.json.nome_social }}</NOMESOCIAL>\n    <EMAILPESSOAL>{{ $('Admissao').item.json.email_pessoal }}</EMAILPESSOAL>\n\n  <PERCENTADIANT>{{ Number($('Admissao').item.json.perc_adiantamento) || 0 }}</PERCENTADIANT>\n<AJUDACUSTO>{{ Number($('Admissao').item.json.ajuda_custo) || 0 }}</AJUDACUSTO>\n<ARREDONDAMENTO>{{ Number($('Admissao').item.json.arredondamento) || 0 }}</ARREDONDAMENTO>\n<MEDIASALMATERN>{{ Number($('Admissao').item.json.media_sal_maternidade) || 0 }}</MEDIASALMATERN>\n\n    <DTOPCAOFGTS>{{ $('Admissao').item.json.dt_admissao }}</DTOPCAOFGTS>\n    <DTMUDANCASALARIO>{{ $('Admissao').item.json.dt_admissao }}</DTMUDANCASALARIO>\n    <MOTMUDANCASALARIO>01</MOTMUDANCASALARIO>\n    <DTMUDANCAFUNCAO>{{ $('Admissao').item.json.dt_admissao }}</DTMUDANCAFUNCAO>\n    <MOTMUDANCAFUNCAO>01</MOTMUDANCAFUNCAO>\n    <HSTSIT_DATAMUDANCA>{{ $('Admissao').item.json.dt_admissao }}</HSTSIT_DATAMUDANCA>\n    <HSTSIT_MOTIVO>01</HSTSIT_MOTIVO>\n    <DTMUDANCAHORARIO>{{ $('Admissao').item.json.dt_admissao }}</DTMUDANCAHORARIO>\n    <DTMUDANCASECAO>{{ $('Admissao').item.json.dt_admissao }}</DTMUDANCASECAO>\n    <MOTMUDANCASECAO>01</MOTMUDANCASECAO>\n    <HSTSEFIP_DTMUDANCA>{{ $('Admissao').item.json.dt_admissao }}</HSTSEFIP_DTMUDANCA>\n    <HSTBANCO_DTMUDANCA>{{ $('Admissao').item.json.dt_admissao }}</HSTBANCO_DTMUDANCA>\n    <CODTIPORUA>{{ $('Admissao').item.json.tipo_rua.id_origem }}</CODTIPORUA>\n    <CODTIPOBAIRRO>{{ $('Admissao').item.json.tipo_bairro.id_origem }}</CODTIPOBAIRRO>\n\n    <RNM>{{ $('Admissao').item.json.rnm }}</RNM>\n    <DECRETO_IMIGRACAO>{{ $('Admissao').item.json.decreto_imigracao }}</DECRETO_IMIGRACAO>\n    <UF_EMISSOR_RNM>{{ $('Admissao').item.json.uf_emissor_rnm }}</UF_EMISSOR_RNM>\n    <DATA_EMISSAO_RNM>{{ $('Admissao').item.json.data_emissao_rnm }}</DATA_EMISSAO_RNM>\n    <DATA_VENCIMENTO_RNM>{{ $('Admissao').item.json.data_vencimento_rnm }}</DATA_VENCIMENTO_RNM>\n    <DATA_VENCIMENTO_CTPS>{{ $('Admissao').item.json.data_vencimento_ctps }}</DATA_VENCIMENTO_CTPS> \n\n  </PFUNC>\n</FopFunc>\n",
+              "type": "string"
+            },
+            {
+              "id": "20576556-102e-436b-8c71-9e22e44da760",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3296,
+        1296
+      ],
+      "id": "79451796-49b7-4167-847c-2b99971a472b",
+      "name": "De Para XML Pfunc"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant_domain\":\"{{ $json.content.body.referencias.tenant_domain }}\", \n  \"idadmissao\": {{ $json.content.body.referencias.admissao_id }},\n  \"coligada\": {{ parseInt($json.content.body.referencias.tenant_domain.replaceAll('dirhect.mazars.com.br','').substring(1)) }}, \n \"idtarefa\": \"{{ $json.content.body.referencias.tarefa_id }}\"\n}\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        1488
+      ],
+      "id": "0fba642d-568a-48f6-a9a5-beb260a3b2d4",
+      "name": "Credenciais",
+      "notes": " {{ $json.content.body.referencias.admissao_id }},"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        1488
+      ],
+      "id": "151d3980-232b-456d-8b80-45ef5d352253",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/admissao/{{ $('Credenciais').item.json.idadmissao }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        384,
+        1488
+      ],
+      "id": "a472ff9b-b1c7-4198-a151-7a1173b2c238",
+      "name": "Admissao"
+    },
+    {
+      "parameters": {
+        "jsCode": "const xml = $json.xml || $json.data || $json.text || \"\"; // campo do XML\n\nconst novoXml = xml.replace(/>([^<]+)</g, (match, texto) => {\n  const t = (texto || \"\").trim().toLowerCase();\n  if (t === '' || t === 'null' || t === 'undefined') {\n    return '><'; // apaga o valor, mantém apenas as tags\n  }\n  return '>' + texto + '<'; // mantém exatamente como veio\n});\n\nreturn { xml: novoXml };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3520,
+        1296
+      ],
+      "id": "4406991a-9cba-4d3f-81ba-5e024a6700e2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/wsDataServer/IwsDataServer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "SOAPAction",
+              "value": "http://www.totvs.com/IwsDataServer/SaveRecord"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tot=\"http://www.totvs.com/\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <tot:SaveRecord>\n         <!--Optional:-->\n         <tot:DataServerName>FopFuncData</tot:DataServerName>\n         <!--Optional:-->\n         <tot:XML><![CDATA[{{ $json.xml }}]]></tot:XML>\n         <!--Optional:-->\n         <tot:Contexto>CODCOLIGADA={{ $('Credenciais').item.json.coligada }}</tot:Contexto>\n      </tot:SaveRecord>\n   </soapenv:Body>\n</soapenv:Envelope>",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3744,
+        1296
+      ],
+      "id": "f9b13266-0213-47cd-ae3e-7f23a7ef4c95",
+      "name": "EnviaRM"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        3968,
+        1296
+      ],
+      "id": "2cae9ebe-5cef-42d8-ab68-0ceda5a35f2b",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00068730-e36b-4b41-83d8-032ae70e1bd4",
+              "leftValue": "={{ $json['s:Envelope']['s:Body'].SaveRecordResponse.SaveRecordResult }}",
+              "rightValue": "={{ $('Credenciais').item.json.coligada }};{{ $('CHAPA').item.json.CHAPA }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4416,
+        1296
+      ],
+      "id": "18169059-3e71-46be-9178-4c1dfc64f8ae",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_Admissao",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "jsonParseBody": true,
+          "parallelMessages": 1
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        1584
+      ],
+      "id": "5d46a218-4a62-49ab-a3e4-b9cb5189368c",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/wsDataServer/IwsDataServer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "SOAPAction",
+              "value": "http://www.totvs.com/IwsDataServer/SaveRecord"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tot=\"http://www.totvs.com/\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <tot:SaveRecord>\n         <!--Optional:-->\n         <tot:DataServerName>FopDependData</tot:DataServerName>\n         <!--Optional:-->\n         <tot:XML><![CDATA[{{ $json.xml }}]]></tot:XML>\n         <!--Optional:-->\n         <tot:Contexto>CODCOLIGADA=443</tot:Contexto>\n      </tot:SaveRecord>\n   </soapenv:Body>\n</soapenv:Envelope>",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5760,
+        1008
+      ],
+      "id": "1548093e-7845-4e6d-8e30-15cb1fb032d4",
+      "name": "EnviaRM1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "=<FopDependData>         \n<PFDepend>\n    <CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n    <CHAPA>{{ $('CHAPA').item.json.CHAPA }}</CHAPA>\n    <NRODEPEND>{{ $json.id }}</NRODEPEND>\n    <NOME>{{ $json.nome_depend.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase() }}</NOME>\n    <CPF>{{ $json.cpf }}</CPF>\n    <DTNASCIMENTO>{{ $json.dt_nascimento }}</DTNASCIMENTO>\n    <SEXO>{{ $json.genero_id_origem }}</SEXO>\n    <ESTADOCIVIL>{{ $json.estado_civil_id_origem }}</ESTADOCIVIL>\n    <LOCALNASCIMENTO>{{ $json.local_nascimento }}</LOCALNASCIMENTO>\n    <CARTORIO>{{ $json.cartorio }}</CARTORIO>\n    <NROREGISTRO>{{ $json.nroregistro }}</NROREGISTRO>\n    <NROLIVRO>{{ $json.nrolivro }}</NROLIVRO>\n    <NROFOLHA>{{ $json.nrofolha }}</NROFOLHA>\n    <INCIRRF>{{ $json.incidencia_irrf? 1 : 0 }}</INCIRRF>\n    <INCINSS>{{ $json.incidencia_inss? 1 : 0 }}</INCINSS>\n    <INCASSISTMEDICA>{{ $json.incidencia_assist_medica? 1 : 0 }}</INCASSISTMEDICA>\n    <INCPENSAO>{{ $json.incidencia_pensao? 1 : 0 }}</INCPENSAO>\n    <INCDEFINIVEIS></INCDEFINIVEIS>\n    <GRAUPARENTESCO>{{ $json.grau_parentesco_id_origem }}</GRAUPARENTESCO>\n    <CARTAOVACINA>{{ $json.entregou_cartao_vacina }}</CARTAOVACINA>\n    <DATAENTREGACERTIDAO>{{ $('Admissao1').item.json.dt_admissao }}</DATAENTREGACERTIDAO>\n    <FREQESCOLAR>{{ $json.entregou_frequencia_escolar }}</FREQESCOLAR>\n    <UNIVERSITARIO>{{ $json.univ_2o_grau }}</UNIVERSITARIO>\n    <INCSALFAM>{{ $json.incidencia_sal_familia? 1 : 0 }}</INCSALFAM>    \n    <CODCOLFORNEC></CODCOLFORNEC>\n    <CODFORNECEDOR></CODFORNECEDOR>   \n    <NUMEROCARTAOSUS>{{ $json.nrosus }}</NUMEROCARTAOSUS>\n    <NUMDECLARANASCVIVO>{{ $json.nronascidovivo }}</NUMDECLARANASCVIVO>\n    <DEPENDENTEBENEFICIARIOINCAPAZ>0</DEPENDENTEBENEFICIARIOINCAPAZ>\n    <RETENCAOFGTS>0</RETENCAOFGTS>\n    <INCASSISTODONTO>{{ $json.incidencia_assist_odonto? 1 : 0 }}</INCASSISTODONTO>\n  </PFDepend>\n</FopDependData>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5312,
+        912
+      ],
+      "id": "3beb5440-db0c-45d8-a515-fedb0aeaaece",
+      "name": "De Para XML PDEPEND1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "dependentes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        5088,
+        912
+      ],
+      "id": "e151d411-c19b-4c13-94f6-8cd499164e05",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5536,
+        912
+      ],
+      "id": "f4bb463f-2e6b-4e70-abf1-83d38d1c8532",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"CHAPA\": \"{{ $json.CHAPA }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2176,
+        1392
+      ],
+      "id": "16f5800d-7625-4257-b0fb-0171c5054c8d",
+      "name": "CHAPA"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_CHAPA/0/P?parameters=CODCOLIGADA%3D{{ $('Credenciais').item.json.coligada }}%3BCODTIPO%3D{{ $('Admissao').item.json.tipo_funcionario.id_origem }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.coligada }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        1488
+      ],
+      "id": "0c319156-b3b9-43ea-ba0c-88b24f0d9907",
+      "name": "CHAPA SQL",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/admissao/{{ $('Credenciais').item.json.idadmissao }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4864,
+        912
+      ],
+      "id": "3b4d0b33-8b56-4090-9eb7-cb0074f38515",
+      "name": "Admissao1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9ff19aa6-f856-4807-bf16-e77914acade3",
+              "leftValue": "={{ $('Admissao').item.json.dependentes.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4640,
+        1008
+      ],
+      "id": "874a8025-4b6c-4832-919f-6dfa0f0537d0",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        5984,
+        1088
+      ],
+      "id": "30f7d8e6-2f7d-427a-acec-e6957f74141f",
+      "name": "XML1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/concluir/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"mensagem\" : \"Admissão realizada com sucesso - CHAPA: {{ $('CHAPA').item.json.CHAPA }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4864,
+        1104
+      ],
+      "id": "bbda9e0c-476a-4b0f-bd3a-3a4cc1150121",
+      "name": "Finaliza Tarefa"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mensagem\": \"Erro no processo de admissão: {{\n    $json['s:Envelope']['s:Body']\n      .SaveRecordResponse\n      .SaveRecordResult\n      .toJsonString()\n      .replace(/[\\r\\n\\t]/g, ' ')\n      .replace(/\\\\/g, '/')\n      .replace(/\"/g, '')\n      .replace(/\\s+/g, ' ')\n      .slice(0, 4000)\n  }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4864,
+        1488
+      ],
+      "id": "d0bd15c8-7c90-4467-a41e-20c8641b7776",
+      "name": "Finaliza Tarefa1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/concluir/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"mensagem\" : \"Admissão realizada com sucesso - CHAPA: {{ $('CHAPA').item.json.CHAPA }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5984,
+        816
+      ],
+      "id": "25f03738-fe3d-4ee6-bb4f-b2f7988a3a01",
+      "name": "Finaliza Tarefa2"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        6208,
+        816
+      ],
+      "id": "2f2c9186-aefa-424d-a249-c7cd9c914021",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        5088,
+        1488
+      ],
+      "id": "def8c83c-bd79-462d-a26b-071b434cd132",
+      "name": "RabbitMQ1",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        5088,
+        1104
+      ],
+      "id": "12dca4ef-c6f3-49f5-9eea-d51961256530",
+      "name": "RabbitMQ2",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n \"content\": {\"body\":{\n\"referencias\":{\n\n\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant_domain\":\"s167dirhect.mazars.com.br\", \n  \"admissao_id\": 1,\n  \"coligada\": 167, \n \"tarefa_id\": \"502e0780-9dda-4c33-8e2e-586496f96720\"\n\n\n\n}\n}\n}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        1392
+      ],
+      "id": "975dc7ce-e0e5-41b8-a322-5771edb656dd",
+      "name": "Credenciais1",
+      "notes": " {{ $json.content.body.referencias.admissao_id }},"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        5760,
+        816
+      ],
+      "id": "67d3ef60-6ca8-4e5c-a8e1-5e6fc11a1809",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "643ef950-8447-423d-a490-1032c9ab715a",
+              "leftValue": "={{ $json['s:Envelope']['s:Body'].SaveRecordResponse.SaveRecordResult }}",
+              "rightValue": "Foi encontrada uma pessoa com os mesmos dados",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4640,
+        1392
+      ],
+      "id": "0e3e4710-f7df-4db0-8ae4-6e5ef6f0bc80",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"CHAPA\": \"000001\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1888,
+        1264
+      ],
+      "id": "3a6ff963-67ba-40bc-a68b-16064da55cd7",
+      "name": "CHAPA1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6f16d340-a6ce-4063-bcb1-19cc30c0639e",
+              "leftValue": "={{ $json[\"s:Envelope\"][\"s:Body\"].SaveRecordResponse.SaveRecordResult }}",
+              "rightValue": "={{ $('Admissao').item.json.banco }};{{ $('Admissao').item.json.agencia_nova }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3072,
+        1472
+      ],
+      "id": "93b35212-6cf5-434b-95af-6f75ca17af43",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        2848,
+        1472
+      ],
+      "id": "5c965402-faf2-4db7-b79c-421f98e0ec66",
+      "name": "XML13"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1a786b52-1f1c-4ac8-a14e-baf92b0ee3c6",
+              "leftValue": "={{ $('Admissao').item.json.agencia_nova }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "874a8de0-c259-43f9-a927-6714827cc450",
+              "leftValue": "={{ $('Admissao').item.json.agencia_nova }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        1392
+      ],
+      "id": "d24ab3d0-f8ca-4278-9311-05d32e5358a3",
+      "name": "Nova_Agencia"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/wsDataServer/IwsDataServer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "SOAPAction",
+              "value": "http://www.totvs.com/IwsDataServer/SaveRecord"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tot=\"http://www.totvs.com/\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <tot:SaveRecord>\n         <!--Optional:-->\n         <tot:DataServerName>FinAgenciaData</tot:DataServerName>\n         <!--Optional:-->\n         <tot:XML><![CDATA[\n        <FinAgencia>\n          <GAGENCIA>\n            <NUMBANCO>{{ $('Admissao').item.json.banco }}</NUMBANCO>\n            <NUMAGENCIA>{{ $('Admissao').item.json.agencia_nova }}</NUMAGENCIA>\n            <NOME>Agencia {{ $('Admissao').item.json.agencia_nova }}</NOME>            \n          </GAGENCIA>\n        </FinAgencia>]]></tot:XML>\n         <!--Optional:-->\n         <tot:Contexto>CODSISTEMA=P;CODUSUARIO=mestre;CODCOLIGADA=1</tot:Contexto>\n      </tot:SaveRecord>\n   </soapenv:Body>\n</soapenv:Envelope>",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2624,
+        1472
+      ],
+      "id": "0f7fe8e2-498f-4c9b-a1a4-47aa42c611a4",
+      "name": "Cadastra_Agencia"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mensagem\": \"Problema no cadastro de Agência\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3296,
+        1488
+      ],
+      "id": "0955a497-851b-4db2-99c1-8af53b0cc477",
+      "name": "Finaliza Tarefa4"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        3520,
+        1488
+      ],
+      "id": "3246d08e-b608-4090-a302-ebd46139a09f",
+      "name": "RabbitMQ3",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "=<FopFunc>{{ $('Admissao').item.json.id }}\n  <PFUNC>\n    <CODUSUARIO>null</CODUSUARIO>\n    <CHAPA>{{ $('CHAPA').item.json.CHAPA }}</CHAPA>\n    <NROFICHAREG>{{ $('CHAPA').item.json.CHAPA.toNumber() }}</NROFICHAREG>\n    <CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n    <CODRECEBIMENTO>{{ $json.tipo_recebimento.id_origem }}</CODRECEBIMENTO>\n    <CODSITUACAO>{{ $json.tipo_situacao.id_origem }}</CODSITUACAO>\n    <CODTIPO>{{ $json.tipo_funcionario.id_origem }}</CODTIPO>\n    <CODSECAO>{{ $json.secao_id_origem }}</CODSECAO>\n    <CODFUNCAO>{{ $json.funcao_id_origem }}</CODFUNCAO>\n    <CODSINDICATO>{{ $json.sindicato_id_origem }}</CODSINDICATO>\n    <CODHORARIO>{{ $json.horario_id_origem }}</CODHORARIO>\n    <DTBASE>{{ $json.dt_admissao }}</DTBASE>\n    <SALARIO>{{ $json.salario }}</SALARIO>      \n    <DATAADMISSAO>{{ $json.dt_admissao }}</DATAADMISSAO>\n    <TIPOADMISSAO>{{ $json.tipo_admissao.id_origem }}</TIPOADMISSAO>\n    <MOTIVOADMISSAO>{{ $json.motivo_admissao.id_origem }}</MOTIVOADMISSAO>       \n    <CONTAPAGAMENTO>{{ $json.conta_corrente }}</CONTAPAGAMENTO>   \n    <CODFILIAL>{{ $json.filial_id_origem }}</CODFILIAL>\n    <NOME>{{ $json.nome.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase() }}</NOME> \n    <CODBANCOPAGTO>{{ $json.banco }}</CODBANCOPAGTO>\n    <CODAGENCIAPAGTO>{{ $json.agencia_nova ? $json.agencia_nova : $json.num_agencia }}</CODAGENCIAPAGTO>    \n    <CODOCORRENCIA>{{ $json.codigo_ocorrencia_sefip.id_origem }}</CODOCORRENCIA>\n    <CODCATEGORIA>{{ $json.codigo_categoria_sefip.id_origem }}</CODCATEGORIA>    \n    <SEXO>{{ $json.genero.id_origem }}</SEXO>\n    <NACIONALIDADE>{{ $json.nacionalidade }}</NACIONALIDADE>\n    <GRAUINSTRUCAO>{{ $json.grau_instrucao.id_origem }}</GRAUINSTRUCAO>\n    <NATURALIDADE>{{ $json.naturalidade }}</NATURALIDADE>\n    <APELIDO>{{ $json.apelido }}</APELIDO>\n    <EMAIL>{{ $json.email }}</EMAIL>\n    <DTNASCIMENTO>{{ $json.dt_nascimento }}</DTNASCIMENTO>\n    <CARTIDENTIDADE>{{ $json.identidade }}</CARTIDENTIDADE>   \n    <UFCARTIDENT>{{ $json.uf_identidade }}</UFCARTIDENT>\n    <CARTEIRATRAB>{{ $json.carteira_trabalho }}</CARTEIRATRAB>\n    <SERIECARTTRAB>{{ $json.serie_carteira_trab }}</SERIECARTTRAB>\n    <UFCARTTRAB>{{ $json.uf_carteira_trab }}</UFCARTTRAB>\n    <TITULOELEITOR>{{ $json.titulo_eleitor }}</TITULOELEITOR>\n    <SECAOTITELEITOR>{{ $json.secao_titulo_eleitor }}</SECAOTITELEITOR>\n    <ZONATITELEITOR>{{ $json.zona_titulo_eleitor }}</ZONATITELEITOR>\n    <CERTIFRESERV>{{ $json.certificado_reservista }}</CERTIFRESERV>    \n    <CARTMOTORISTA>{{ $json.carteira_motorista }}</CARTMOTORISTA>\n    <TIPOCARTHABILIT>{{ $json.tipo_carteira_habilit }}</TIPOCARTHABILIT>\n    <DTVENCHABILIT>{{ $json.data_venc_habilit }}</DTVENCHABILIT>\n    <CPF>{{ $json.cpf }}</CPF>\n    <REGPROFISSIONAL>{{ $json.registro_profissional }}</REGPROFISSIONAL>\n    <RUA>{{ $json.rua.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase() }}</RUA>\n    <NUMERO>{{ $json.numero }}</NUMERO>\n    <COMPLEMENTO>{{ $json.complemento.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()}}</COMPLEMENTO>\n    <BAIRRO>{{ $json.bairro.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</BAIRRO>\n    <CIDADE>{{ $json.cidade.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</CIDADE>\n    <ESTADO>{{ $json.estado }}</ESTADO>\n    <PAIS>{{ $json.pais_nome }}</PAIS>\n    <CEP>{{ $json.cep }}</CEP>\n    <TELEFONE1>{{ $json.ddd }}{{ $json.telefone }}</TELEFONE1>\n    <TELEFONE2>{{ $json.ddd1 }}{{ $json.telefone1 }}</TELEFONE2>\n    <TELEFONE3>{{ $json.ddd2 }}{{ $json.telefone2 }}</TELEFONE3>\n    <NOMEBANCOPGTO>{{ $json.banco }}</NOMEBANCOPGTO>\n    <NOMEPAI>{{ $json.nome_pai }}</NOMEPAI>\n    <NOMEMAE>{{ $json.nome_mae }}</NOMEMAE>\n    <PISPASEP>{{ $json.pispasep.replace(/\\D/g, '') }}</PISPASEP>\n    <ESOCIALNATATIVIDADE>{{ $json.natureza_atividade_esocial }}</ESOCIALNATATIVIDADE>\n    <TEMPOPARCIAL>{{ $json.contrato_tempo_parcial }}</TEMPOPARCIAL>\n    <SITUACAOFGTS>{{$json.codigo_situacao_fgts.id_origem }}</SITUACAOFGTS>\n    <ORGEMISSORIDENT>{{ $json.orgao_emissor_ident }}</ORGEMISSORIDENT>\n    <DTEMISSAOIDENT>{{ $json.data_emissao_ident }}</DTEMISSAOIDENT>\n    <ESTELEIT>{{ $json.estado_emissor_tit_eleitor }}</ESTELEIT>\n    <DTCARTRAB>{{ $json.data_emissao_ctps }}</DTCARTRAB>\n  <NPASSAPORTE>{{ $json.numero_passaporte }}</NPASSAPORTE>\n <DTEMISSPASSAPORTE>{{ $json.data_emissao_passaporte }}</DTEMISSPASSAPORTE>\n<DTVALPASSAPORTE>{{ $json.data_validade_passaporte }}</DTVALPASSAPORTE>\n<PAISORIGEM>{{ $json.pais_origem }}</PAISORIGEM>\n<OPBANCARIA>{{ $json.conta_operacao }}</OPBANCARIA>\n\n    <JORNADA_MENSAL>{{ \n  (() => {\n    const jornada = $json.jornada; // exemplo: \"123:45\"\n    if (!jornada || !jornada.includes(\":\")) return 0;\n    const [horas, minutos] = jornada.split(\":\").map(Number);\n    return (horas * 60) + minutos;\n  })()\n}}</JORNADA_MENSAL>\n    <JORNADAMENSAL>{{ \n  (() => {\n    const jornada = $json.jornada; // exemplo: \"123:45\"\n    if (!jornada || !jornada.includes(\":\")) return 0;\n    const [horas, minutos] = jornada.split(\":\").map(Number);\n    return (horas * 60) + minutos;\n  })()\n}}</JORNADAMENSAL>\n    <SITUACAOINSS>{{ $json.calcula_inss ? 1 : 0 }}</SITUACAOINSS>\n    <SITUACAOIRRF>{{ $json.calcula_irrf ? 1 : 0}}</SITUACAOIRRF>\n    <SITUACAORAIS>N</SITUACAORAIS>\n    \n    <DEFICIENTEFISICO>{{ $json.deficiente_fisico == true ? 1 : 0 }}</DEFICIENTEFISICO> \n    <CORRACA>{{ $json.cor_raca }}</CORRACA>\n    <ESTADOCIVIL>{{ $json.estado_civil.id_origem }}</ESTADOCIVIL>\n    <ESTADONATAL>{{ $json.estado_natal }}</ESTADONATAL>\n    <TPCONTABANCARIA>{{ $json.tipo_conta === 'C' ? 1 : $json.tipo_conta === 'P' ? 2 : $json.tipo_conta === 'S' ? 3 : 'null' }}</TPCONTABANCARIA>\n    <TPREGIMEPREV>{{ $json.tipo_regime_previdenciario }}</TPREGIMEPREV>    \n    <INDADMISSAO>{{ $json.indicativo_admissao }}</INDADMISSAO>\n    <CODMUNICIPIO>{{ $json.codigo_municipio }}</CODMUNICIPIO>\n    <DTEMISSAOCNH>{{ $json.data_emissao_cnh }}</DTEMISSAOCNH>\n    \n    <TIPOREGIMEJORNADA>{{ $json.tipo_regime_jornada }}</TIPOREGIMEJORNADA>\n    <TIPOREGIMETRABALHISTA>{{ $json.tipo_regime_trabalhista }}</TIPOREGIMETRABALHISTA>\n    <IDADE>{{  $json.dt_nascimento   ? (\n        (new Date().getMonth() < new Date($json.dt_nascimento).getMonth() ||\n        (new Date().getMonth() === new Date($json.dt_nascimento).getMonth() &&\n        new Date().getDate() < new Date($json.dt_nascimento).getDate()))\n          ? (new Date().getFullYear() - new Date($json.dt_nascimento).getFullYear() - 1)\n          : (new Date().getFullYear() - new Date($json.dt_nascimento).getFullYear())\n      )    : null}}</IDADE>\n    \n    <CODCATEGORIAESOCIAL>{{ $json.codigo_categoria_esocial.id_origem }}</CODCATEGORIAESOCIAL>\n    <DTTITELEITOR>{{ $json.data_titulo_eleitor }}</DTTITELEITOR>  \n    <SITMILITAR>{{ $json.situacao_militar }}</SITMILITAR>\n   <INDINICIOHOR>{{ $json.horario_indice }}</INDINICIOHOR>\n    <PRIMEIRONOME>{{ $json.nome.split(' ')[0]\n.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n.replace(/[^A-Z0-9.,@\\- ]/gi, \"\").toUpperCase()\n }}</PRIMEIRONOME>\n   \n    <SOBRENOMEPAI>{{ $json.sobrenome_pai }}</SOBRENOMEPAI>\n    <SOBRENOMEMAE>{{ $json.sobrenome_mae }}</SOBRENOMEMAE>\n\n    <CODUFREGISTRO>{{ $json.uf_registro_profissional }}</CODUFREGISTRO>\n   \n    <NOMESOCIAL>{{ $json.nome_social }}</NOMESOCIAL>\n    <EMAILPESSOAL>{{ $json.email_pessoal }}</EMAILPESSOAL>\n\n  <PERCENTADIANT>{{ $json.perc_adiantamento.toNumber()}}</PERCENTADIANT>\n<AJUDACUSTO>{{ $json.ajuda_custo.toNumber()}}</AJUDACUSTO>\n<ARREDONDAMENTO>{{ $json.arredondamento.toNumber()}}</ARREDONDAMENTO>\n<MEDIASALMATERN>{{ $json.media_sal_maternidade.toNumber()}}</MEDIASALMATERN>\n\n    <DTOPCAOFGTS>{{ $json.dt_admissao }}</DTOPCAOFGTS>\n    <DTMUDANCASALARIO>{{ $json.dt_admissao }}</DTMUDANCASALARIO>\n    <MOTMUDANCASALARIO>01</MOTMUDANCASALARIO>\n    <DTMUDANCAFUNCAO>{{ $json.dt_admissao }}</DTMUDANCAFUNCAO>\n    <MOTMUDANCAFUNCAO>01</MOTMUDANCAFUNCAO>\n    <HSTSIT_DATAMUDANCA>{{ $json.dt_admissao }}</HSTSIT_DATAMUDANCA>\n    <HSTSIT_MOTIVO>01</HSTSIT_MOTIVO>\n    <DTMUDANCAHORARIO>{{ $json.dt_admissao }}</DTMUDANCAHORARIO>\n    <DTMUDANCASECAO>{{ $json.dt_admissao }}</DTMUDANCASECAO>\n    <MOTMUDANCASECAO>01</MOTMUDANCASECAO>\n    <HSTSEFIP_DTMUDANCA>{{ $json.dt_admissao }}</HSTSEFIP_DTMUDANCA>\n    <HSTBANCO_DTMUDANCA>{{ $json.dt_admissao }}</HSTBANCO_DTMUDANCA>\n    <CODTIPORUA>{{ $json.tipo_rua.id_origem }}</CODTIPORUA>\n    <CODTIPOBAIRRO>{{ $json.tipo_bairro.id_origem }}</CODTIPOBAIRRO>\n\n    <RNM>{{ $json.rnm }}</RNM>\n    <DECRETO_IMIGRACAO>{{ $json.decreto_imigracao }}</DECRETO_IMIGRACAO>\n    <UF_EMISSOR_RNM>{{ $json.uf_emissor_rnm }}</UF_EMISSOR_RNM>\n    <DATA_EMISSAO_RNM>{{ $json.data_emissao_rnm }}</DATA_EMISSAO_RNM>\n    <DATA_VENCIMENTO_RNM>{{ $json.data_vencimento_rnm }}</DATA_VENCIMENTO_RNM>\n    <DATA_VENCIMENTO_CTPS>{{ $json.data_vencimento_ctps }}</DATA_VENCIMENTO_CTPS> \n\n  </PFUNC>\n</FopFunc>\n",
+              "type": "string"
+            },
+            {
+              "id": "20576556-102e-436b-8c71-9e22e44da760",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        368
+      ],
+      "id": "5d8de527-4be9-4f53-985f-0db73a0a7eac",
+      "name": "De Para XML Pfunc1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mensagem\": \"Erro no processo de admissão: {{\n    $json['s:Envelope']['s:Body']\n      .SaveRecordResponse\n      .SaveRecordResult\n      .toJsonString()\n      .replace(/[\\r\\n\\t]/g, ' ')\n      .replace(/\\\\/g, '/')\n      .replace(/\"/g, '')\n      .replace(/\\s+/g, ' ')\n      .slice(0, 4000).split(\"==\")[0].replaceAll(/(\\/r\\/n)/g, ', ')\n  }} ATIVA em uma COLIGADA. Por favor revisar.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4864,
+        1296
+      ],
+      "id": "fbbfaabe-a871-420e-aca1-e4506bd21d0a",
+      "name": "Finaliza Tarefa3"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        5088,
+        1296
+      ],
+      "id": "5ef93993-e5bf-47b8-8b28-d62bc07c2b0f",
+      "name": "RabbitMQ4",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"mensagem\": \"Erro no criação da CHAPA\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2176,
+        1664
+      ],
+      "id": "71303a1a-6285-443c-9624-c6673859dd9d",
+      "name": "Finaliza Tarefa5"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2400,
+        1664
+      ],
+      "id": "c641bca1-05e1-46f5-aca2-e5ce4e9638c0",
+      "name": "RabbitMQ5",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1a786b52-1f1c-4ac8-a14e-baf92b0ee3c6",
+              "leftValue": "={{ Object.keys($json.CHAPA || {}).length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        1488
+      ],
+      "id": "4ac55af0-63e3-47cb-b19a-bf4e233c69d5",
+      "name": "Verifica Chapa"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_READMISAO/0/P?parameters=CPF%3D{{ $('Admissao').item.json.cpf }}%3BNOME%3D{{ $('Admissao').item.json.nome }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.coligada }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        1488
+      ],
+      "id": "c65c2d56-0d0e-477a-8375-3675c0a07e38",
+      "name": "READMISSAO",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        5312,
+        1488
+      ],
+      "id": "a183f90b-d736-430f-a0de-7f4dc0e353a0",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        5312,
+        1296
+      ],
+      "id": "43ffc1a6-dd6e-4a30-a8ae-0e329d1c524e",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        1488
+      ],
+      "id": "f088be93-29a7-4156-8b55-f310c466ffa6",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        1664
+      ],
+      "id": "1808520e-d108-49e1-9bf1-a58fb862668d",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "64baa497-42ef-43ed-a97c-fbab1c1960b0",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4192,
+        1296
+      ],
+      "id": "2bb46041-eaf2-47fc-8646-33af4d819260",
+      "name": "Rateio Fixo"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_PARAM/0/P?parameters=COLIGADA%3D{{ $('Credenciais').item.json.coligada }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.coligada }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        1488
+      ],
+      "id": "3b43ade8-b645-4c6a-a234-cd0b20ee1de8",
+      "name": "PARAMETROS",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_PARAM/0/P?parameters=COLIGADA%3D{{ $('Credenciais').item.json.coligada }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.coligada }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -512,
+        144
+      ],
+      "id": "8e8a3642-8812-4079-995a-7b2293e72f1a",
+      "name": "PARAMETROS1",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/centro_custo/{{ $json.centro_custo }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        1488
+      ],
+      "id": "92f08d42-8e56-43d2-92d4-0e2e5e7bcf91",
+      "name": "CentroCusto",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1a786b52-1f1c-4ac8-a14e-baf92b0ee3c6",
+              "leftValue": "={{ Object.keys($json.CHAPA || {}).length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1952,
+        1616
+      ],
+      "id": "9ee3e68b-79d9-45ff-8a60-ce0e7a0f64c2",
+      "name": "Verifica Chapa1"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_CHAPA/0/P?parameters=CODCOLIGADA%3D{{ $('Credenciais').item.json.coligada }}%3BCODTIPO%3D%25",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.coligada }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1728,
+        1616
+      ],
+      "id": "9da47fa1-cf6c-4d44-8b3c-9af6b50024b1",
+      "name": "CHAPA SQL1",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "Admissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Admissao": {
+      "main": [
+        [
+          {
+            "node": "CentroCusto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para XML Pfunc": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "EnviaRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviaRM": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Rateio Fixo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviaRM1": {
+      "main": [
+        [
+          {
+            "node": "XML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para XML PDEPEND1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "De Para XML PDEPEND1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EnviaRM1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHAPA": {
+      "main": [
+        [
+          {
+            "node": "Nova_Agencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHAPA SQL": {
+      "main": [
+        [
+          {
+            "node": "Verifica Chapa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Admissao1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Admissao1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finaliza Tarefa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa2": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa1": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais1": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ2": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Finaliza Tarefa2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Finaliza Tarefa3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finaliza Tarefa1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHAPA1": {
+      "main": [
+        []
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "De Para XML Pfunc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finaliza Tarefa4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML13": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nova_Agencia": {
+      "main": [
+        [
+          {
+            "node": "De Para XML Pfunc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cadastra_Agencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cadastra_Agencia": {
+      "main": [
+        [
+          {
+            "node": "XML13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa4": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa3": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa5": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica Chapa": {
+      "main": [
+        [
+          {
+            "node": "CHAPA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CHAPA SQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "READMISSAO": {
+      "main": [
+        [
+          {
+            "node": "PARAMETROS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ4": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ3": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ5": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rateio Fixo": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PARAMETROS": {
+      "main": [
+        [
+          {
+            "node": "CHAPA SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CentroCusto": {
+      "main": [
+        [
+          {
+            "node": "READMISSAO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica Chapa1": {
+      "main": [
+        [
+          {
+            "node": "CHAPA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finaliza Tarefa5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHAPA SQL1": {
+      "main": [
+        [
+          {
+            "node": "Verifica Chapa1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b15b3816-7371-4ce7-a0b2-cd489719b63d",
+  "activeVersionId": "b15b3816-7371-4ce7-a0b2-cd489719b63d",
+  "versionCounter": 95,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-07-26T02:24:21.344Z",
+      "createdAt": "2025-07-26T02:24:21.344Z",
+      "role": "workflow:owner",
+      "workflowId": "2jP88TlmlvvwlmAN",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
