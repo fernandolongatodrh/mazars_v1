@@ -1,0 +1,126 @@
+{
+  "updatedAt": "2025-12-16T14:28:56.950Z",
+  "createdAt": "2025-07-28T13:39:27.187Z",
+  "id": "Bk2sjIewjbwrWdVd",
+  "name": "Webhook - Tarefa Admissao",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bfa979e1-a883-4fc0-bf67-f5710a27cc7b",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dee9277e-d7c2-48ed-8869-f8011da0e43c",
+      "name": "Webhook",
+      "webhookId": "bfa979e1-a883-4fc0-bf67-f5710a27cc7b"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_Admissao",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0f7d7ad3-8398-4626-89f8-d8ef06366bc3",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "36f9b9e7-c874-450c-acdc-0e293954b1e1",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "34425aee-29b3-4fdd-8e06-9ed57e9b7769",
+  "activeVersionId": "34425aee-29b3-4fdd-8e06-9ed57e9b7769",
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-07-28T13:39:27.187Z",
+      "createdAt": "2025-07-28T13:39:27.187Z",
+      "role": "workflow:owner",
+      "workflowId": "Bk2sjIewjbwrWdVd",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
