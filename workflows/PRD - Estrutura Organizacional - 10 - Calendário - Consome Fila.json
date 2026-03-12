@@ -1,0 +1,582 @@
+{
+  "updatedAt": "2025-11-18T04:47:32.372Z",
+  "createdAt": "2025-11-10T18:07:47.010Z",
+  "id": "Cb4Gn251MoNb6n9H",
+  "name": "PRD - Estrutura Organizacional - 10 - Calendário - Consome Fila",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/calendario/bulk-upsert/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{{ $json.dados }}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -144,
+        240
+      ],
+      "id": "4dedef44-cb11-454e-ac4a-a039af8c026d",
+      "name": "HTTP Request1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        -208
+      ],
+      "id": "2741f7ef-5665-45b0-89d0-e1f64ec37780",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"referencias\": {\n    \"tarefa_id\": \"{{ $json.body.referencias.tarefa_id }}\",\n    \"tenant_id\": \"{{ $json.body.referencias.tenant_id }}\",\n    \"tenant_nome\": \"{{ $json.body.referencias.tenant_nome }}\",\n    \"tenant_domain\": \"{{ $json.body.referencias.tenant_domain }}\",\n    \"tenant_schema\": \"{{ $json.body.referencias.tenant_schema }}\"\n  },\n  \"sistema_origem\": {\n    \"servidor\": \"{{ $json.body.sistema_origem.servidor }}\",\n    \"porta_soap\":{{ $json.body.sistema_origem.porta_soap }},\n    \"porta_rest\": {{ $json.body.sistema_origem.porta_rest }},\n    \"autorizacao\": \"{{ $json.body.sistema_origem.autorizacao }}\",\n    \"coligada\": {{ $json.body.sistema_origem.coligada }}\n  },\n  \"data_modificacao\": \"{{ $json.body.data_modificacao }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1488,
+        304
+      ],
+      "id": "6710e6dd-2f66-45f7-956b-91a6ad792ccb",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id_origem\": \"{{ $json.CODIGO }}\",\n  \"nome\": \"{{ $json.NOME }}\",\n  \"descricao\": \"{{ $json.NOME }}\",\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        192
+      ],
+      "id": "1ae7a19b-3396-427b-921a-45e24bdfc799",
+      "name": "De Para"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        cleanedData[key] = (item.json[key] === \"null\" || item.json[key] === \"undefined\" || item.json[key] === undefined) ? null : item.json[key];\n    }\n\n    return { json: { dados: JSON.stringify(cleanedData) } };\n});\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        208
+      ],
+      "id": "9b189868-96ff-4301-9696-feadbcfa7bb5",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.referencias.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1264,
+        304
+      ],
+      "id": "1ae187a6-a690-4c84-83d0-55a368b41f84",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_calendario",
+        "options": {
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          },
+          "jsonParseBody": true,
+          "onlyContent": true,
+          "parallelMessages": 2
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1712,
+        384
+      ],
+      "id": "383667c9-e32c-4b36-b933-2c456d6dca18",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        192
+      ],
+      "id": "13c34b77-f311-4db0-a889-3fcf9dc20cc7",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_feriado",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        16
+      ],
+      "id": "147ddf58-5507-4ffd-9eb5-c940adb1c962",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\"body\":{{ $('Credenciais').all()[0].json }}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -144,
+        16
+      ],
+      "id": "8dfbce1b-118c-41f2-a28b-7e93ea5d4641",
+      "name": "Sequenciar"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "23367f32-d3f1-4334-9d72-9b81b29b3a9a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.message }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        304,
+        240
+      ],
+      "id": "a9be6ef8-05c9-4d36-a80e-11d5e20714a2",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "error.message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        80,
+        240
+      ],
+      "id": "f1fc0713-6863-455f-99ec-a00f7350cc0b",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.message }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        496
+      ],
+      "id": "c174e07f-bbfe-4196-96e2-34c1c0067bc0",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "batchSize": 300,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        192
+      ],
+      "id": "6fb9065f-6eb8-4d84-a7ad-ed19792bdaa8",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/sincronizacao/atualiza-status-sincronizacao/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"schema_name\": \"{{ $('Credenciais').item.json.referencias.tenant_schema }}\",\n  \"tipo_sincronizacao\": \"estrutura\",\n  \"integracao\": \"erro\",\n  \"mensagem\": \"Erro na integração de: Filial. Mensagem: {{ JSON.parse($('SQL').item.json.error.message.split(' - ')[1]).messages.map(m => m.detail.replace(/(\\\\r\\\\n|\\\\n|\\\\r|[\\n\\r])/g, ' ')).join(' | ') }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -784,
+        480
+      ],
+      "id": "d2f5bce9-c18b-4611-9f20-991bbc62dee5",
+      "name": "erro_para_dirhect"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"body\": {\n\"referencias\": {\n\"tarefa_id\": \"000000\",\n\"tenant_id\": \"13\",\n\"tenant_nome\": \"Segalas Alimentos Ltda\",\n\"tenant_domain\": \"s443dirhect.mazars.com.br\",\n\"tenant_schema\": \"S443\"\n},\n\"sistema_origem\": {\n\"servidor\": \"https://172.16.60.23\",\n\"porta_soap\": 8051,\n\"porta_rest\": 8051,\n\"autorizacao\": \"Basic bWVzdHJlOkZNQDIwMjQ=\",\n\"coligada\": 443\n},\n\"data_modificacao\": \"1900-11-10\"\n}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1712,
+        192
+      ],
+      "id": "d8d20636-e7e9-4cf3-88a8-ad44a346aa4f",
+      "name": "Credenciais1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Credenciais').item.json.sistema_origem.servidor }}:{{   $('Credenciais').item.json.sistema_origem.porta_rest }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_CALEND/0/P?parameters=COLIGADA%3D{{ $('Credenciais').item.json.sistema_origem.coligada }}%3BDATAMOD%3D{{  $('Credenciais').item.json.data_modificacao ?? '1900-01-01' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.sistema_origem.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('Credenciais').item.json.sistema_origem.coligada }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "acb781ad-ec22-484b-9a64-e64e50cf30f5",
+      "name": "SQL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1040,
+        304
+      ],
+      "onError": "continueErrorOutput",
+      "notes": "Ajustar \n\ntipo_logradouro"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        []
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sequenciar": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Sequenciar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "erro_para_dirhect": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais1": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ": {
+      "main": [
+        []
+      ]
+    },
+    "SQL": {
+      "main": [
+        [
+          {
+            "node": "De Para",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "erro_para_dirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "721aab75-7086-4758-afce-7e8d37c8b633",
+  "activeVersionId": "721aab75-7086-4758-afce-7e8d37c8b633",
+  "versionCounter": 6,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-11-10T18:07:47.010Z",
+      "createdAt": "2025-11-10T18:07:47.010Z",
+      "role": "workflow:owner",
+      "workflowId": "Cb4Gn251MoNb6n9H",
+      "projectId": "cJj10Rj257oQ172p",
+      "project": {
+        "updatedAt": "2025-09-07T13:33:24.498Z",
+        "createdAt": "2025-09-07T13:31:44.205Z",
+        "id": "cJj10Rj257oQ172p",
+        "name": "Integração Produção <integracao_producao@dirhect.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
