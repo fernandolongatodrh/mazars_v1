@@ -1,0 +1,126 @@
+{
+  "updatedAt": "2025-08-01T01:12:55.048Z",
+  "createdAt": "2025-08-01T01:10:26.243Z",
+  "id": "HoKdTNR0bgroqaSo",
+  "name": "Dirhect - Webhook - Tarefa Ferias",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2c359cfa-2b4e-4ac9-9a25-db1206352e9a",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2bd5a4c4-edff-4cc0-8357-336d2af7d93f",
+      "name": "Webhook",
+      "webhookId": "2c359cfa-2b4e-4ac9-9a25-db1206352e9a"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_MarcaFerias",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ec303106-ab76-43bd-80bb-a99d14035b7e",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b67b03a1-c4dc-485a-80fc-e5258798f4d2",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ce3fe8a4-425c-4d70-af45-4198866bd901",
+  "activeVersionId": "ce3fe8a4-425c-4d70-af45-4198866bd901",
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-08-01T01:10:26.243Z",
+      "createdAt": "2025-08-01T01:10:26.243Z",
+      "role": "workflow:owner",
+      "workflowId": "HoKdTNR0bgroqaSo",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
