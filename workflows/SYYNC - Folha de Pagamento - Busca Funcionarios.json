@@ -1,0 +1,195 @@
+{
+  "updatedAt": "2025-08-02T17:16:50.354Z",
+  "createdAt": "2025-08-01T11:55:44.822Z",
+  "id": "niEtwRP0PebpyuoE",
+  "name": "SYYNC - Folha de Pagamento - Busca Funcionarios",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant }}.mazars.com.br/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -64
+      ],
+      "id": "868d2839-38f0-4e45-ab56-ae4eca997758",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant\":\"s443dirhect\"\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        -64
+      ],
+      "id": "83f5b5e7-3736-4a4f-ad51-718df4f2e56c",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRC.0002/{{ $('Webhook').item.json.body.referencias.metadados.CODCOLIGADA }}/P?parameters=CODCOLIGADA%3D{{ $('Webhook').item.json.body.referencias.metadados.CODCOLIGADA }}%3BANO%3D{{ $('Webhook').item.json.body.referencias.metadados.ANO }}%3BMES%3D{{ $('Webhook').item.json.body.referencias.metadados.MES }}%3BPERIODO%3D{{ $('Webhook').item.json.body.referencias.metadados.NROPERIODO }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1024,
+        -64
+      ],
+      "id": "c82d1ae6-c5b0-4fb1-954d-284e30c14b5e",
+      "name": "Funcionario",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "queue": "SYYNC_FP_Funcionarios",
+        "options": {
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        -64
+      ],
+      "id": "d2191f95-d3d2-4c1e-9ae6-3eafa8bb1c40",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b4de021e-323c-4741-aca4-3ba413bd8c36",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -64
+      ],
+      "id": "18d333eb-26da-45c5-a175-bff44de29b8b",
+      "name": "Webhook",
+      "webhookId": "b4de021e-323c-4741-aca4-3ba413bd8c36"
+    }
+  ],
+  "connections": {
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "Funcionario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Funcionario": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a12704bb-5a63-4f81-8863-617a8308d098",
+  "activeVersionId": "a12704bb-5a63-4f81-8863-617a8308d098",
+  "versionCounter": 5,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-08-01T11:55:44.822Z",
+      "createdAt": "2025-08-01T11:55:44.822Z",
+      "role": "workflow:owner",
+      "workflowId": "niEtwRP0PebpyuoE",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
