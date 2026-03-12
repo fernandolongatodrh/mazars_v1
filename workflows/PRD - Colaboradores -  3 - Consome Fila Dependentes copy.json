@@ -1,0 +1,726 @@
+{
+  "updatedAt": "2026-03-12T10:42:43.020Z",
+  "createdAt": "2026-03-12T09:45:01.193Z",
+  "id": "K2EGknSIrTZ6Aifo",
+  "name": "PRD - Colaboradores -  3 - Consome Fila Dependentes copy",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"referencias\": {\n    \"tarefa_id\": \"{{ $json.referencias.tarefa_id }}\",\n    \"tenant_id\": \"{{ $json.referencias.tenant_id }}\",\n    \"tenant_nome\": \"{{ $json.referencias.tenant_nome }}\",\n    \"tenant_domain\": \"{{ $json.referencias.tenant_domain }}\",\n    \"tenant_schema\": \"{{ $json.referencias.tenant_schema }}\"\n  },\n  \"sistema_origem\": {\n    \"servidor\": \"{{ $json.sistema_origem.servidor }}\",\n    \"porta_soap\":{{ $json.sistema_origem.porta_soap }},\n    \"porta_rest\": {{ $json.sistema_origem.porta_rest }},\n    \"autorizacao\": \"{{ $json.sistema_origem.autorizacao }}\",\n    \"coligada\": {{ $json.sistema_origem.coligada }}\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        -96
+      ],
+      "id": "d63c62bf-a571-424e-a8d6-a3b6031c72e3",
+      "name": "Credenciais"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Credenciais').item.json.sistema_origem.servidor }}:{{ $('Credenciais').item.json.sistema_origem.porta_rest }}/api/framework/v1/consultaSQLServer/RealizaConsulta/DRHAPI_DEPEND/0/P?parameters=\nCODCOLIGADA%3D{{ $('Credenciais').item.json.sistema_origem.coligada }}%3BDATAMOD%3D{{  $('Credenciais').item.json.sistema_origem.datamod ?? '19000101' }}%3BCHAPA%3D{{ $('PFUNC').item.json.CHAPA }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('PFUNC').item.json.sistema_origem.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "={{ $('PFUNC').item.json.sistema_origem.coligada }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a0a9bd1c-5e81-4232-beab-2ec19abe01c4",
+      "name": "DEPEND",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        576,
+        -448
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const cleanedData = {};\n\n    for (const key in item.json) {\n        const value = item.json[key];\n        \n        if (value !== null && value !== \"null\" && value !== undefined && value !== \"undefined\") {\n            cleanedData[key] = value;\n        }\n    }\n\n    return cleanedData; // Mudança principal: sem encapsular\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        -144
+      ],
+      "id": "508a24db-368f-478c-91dd-8c2839a09640",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"id_funcionario__chapa\":\"{{$json.CHAPA}}\",\n\"chapa\":\"{{$json.CHAPA}}\",\n\"nrodepend\": \"{{$json.NRODEPEND }}\",\n\"nome_depend\": \"{{$json.NOME.replace(/[^\\p{L}\\p{N}\\s'’\\-.]/gu, '').trim()}}\",\n\"cpf\":  \"{{$json.CPF }}\",\n\"dtnascimento\":  \"{{ $json.DTNASCIMENTO.split('T')[0] }}\",\n\"sexo\": {{ $json.id_sexo  }},\n\"estadocivil\":  {{ $json.id_estadocivil  }},\n\"cartorio\":  \"{{$json.CARTORIO }}\",\n\"nroregistro\":  \"{{$json.NROREGISTRO  }}\",\n\"nrolivro\":  \"{{$json.NROLIVRO }}\",\n\"nrofolha\":  \"{{$json.NROFOLHA }}\",\n\"grau_parentesco\": {{ $json.id_grauparentesco  }},\n\"cartao_vacina\":  \"{{$json.CARTAOVACINA }}\",\n\"nrosus\":  \"{{$json.NUMEROCARTAOSUS }}\",\n\"nronascidovivo\":  \"{{$json.NUMDECLARANASCVIVO }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        -144
+      ],
+      "id": "f1a6fb43-9494-4832-80e8-1f778ad215f8",
+      "name": "De Para - Depend"
+    },
+    {
+      "parameters": {
+        "queue": "prod_RH_Dependentes_PFDEPEND",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "headers": {
+            "header": [
+              {
+                "key": "x-queue-type",
+                "value": "quorum"
+              }
+            ]
+          },
+          "jsonParseBody": true,
+          "onlyContent": true,
+          "parallelMessages": 10
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -96
+      ],
+      "id": "3ed05d9b-372e-46e6-ba4d-628b2839b117",
+      "name": "PFUNC",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.referencias.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        -96
+      ],
+      "id": "eae1216a-cbca-45b1-9349-153d0f0797e3",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/estado_civil/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        -240
+      ],
+      "id": "b99400e3-8311-4499-8be1-6cd7ce2280f8",
+      "name": "ESTADOCIVIL"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2352,
+        -240
+      ],
+      "id": "ead178da-87f2-4912-a7f0-b9e52a7327a5",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f602413a-82f9-4245-9cdf-4d658a54a867",
+              "leftValue": "={{ $json.CODCOLIGADA.toString() }}",
+              "rightValue": "={{ $('PFUNC').item.json.CODCOLIGADA.toString() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        -448
+      ],
+      "id": "107c001d-7910-490b-9c8e-0aaabcfdbea5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        -496
+      ],
+      "id": "20de4dda-a4af-41a0-b5af-f551cc86811e",
+      "name": "RabbitMQ1",
+      "credentials": {
+        "rabbitmq": {
+          "id": "HLRdbyi6jq8xkCIj",
+          "name": "RabbitMQ Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/genero/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        -48
+      ],
+      "id": "ed14cac0-814a-4456-84c1-5ffe5bc8d56c",
+      "name": "SEXO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/tabela_dominio/grau_parentesco/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        144
+      ],
+      "id": "3273ca58-1a65-4fdc-b26b-78ed9175ac3d",
+      "name": "GRAUPARENTESCO"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        -240
+      ],
+      "id": "b1f93ceb-35f2-4acf-8397-396ee7dc9353",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "MdGxhyDm6WJV5xQh",
+          "mode": "list",
+          "cachedResultName": "erro_dependente",
+          "cachedResultUrl": "/projects/cJj10Rj257oQ172p/datatables/MdGxhyDm6WJV5xQh"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "erro": "={{ $json.error.message.split(' - ')[1].replaceAll(/[{}[\\]\"\\\\]/g, ' ').trim() }}",
+            "tenant": "={{ $('Credenciais').item.json.referencias.tenant_domain }}",
+            "matricula": "={{$('DEPEND').item.json.CHAPA}}",
+            "nrdependente": "={{$('DEPEND').item.json.NRODEPEND || ''}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "erro",
+              "displayName": "erro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "matricula",
+              "displayName": "matricula",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tenant",
+              "displayName": "tenant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nrdependente",
+              "displayName": "nrdependente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        -48
+      ],
+      "id": "4fc41335-3957-4bc2-a662-e76011c87d26",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=registros",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -240
+      ],
+      "id": "a54a01ab-d248-46a5-8642-3f943f73db15",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=registros",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -48
+      ],
+      "id": "d653cda6-c410-453e-a840-a71e9fd3cab9",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=registros",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        800,
+        144
+      ],
+      "id": "36f5e956-0613-41fa-9116-13a88a0f1313",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "numberInputs": 4,
+        "query": "SELECT input1.*,input2.id as id_estadocivil,input3.id as id_sexo,input4.id as id_grauparentesco FROM input1 INNER JOIN input2 ON input2.id_origem = input1.ESTADOCIVIL\nINNER JOIN input3 ON input3.id_origem = input1.SEXO\nINNER JOIN input4 ON input4.id_origem = input1.GRAUPARENTESCO",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1024,
+        -176
+      ],
+      "id": "8511b8f6-6b2f-4733-937d-434bdf9d80da",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.referencias.tenant_domain }}/api/dependente/bulk-upsert/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1904,
+        -144
+      ],
+      "id": "3956ae06-f5e9-4405-90ab-ce4f635b2255",
+      "name": "POST Dirhect",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        -144
+      ],
+      "id": "89e1fbba-d3a0-444d-928c-a9ac26aaa21e",
+      "name": "Aggregate1"
+    }
+  ],
+  "connections": {
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEPEND": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "POST Dirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para - Depend": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PFUNC": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "ESTADOCIVIL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SEXO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GRAUPARENTESCO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEPEND",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ESTADOCIVIL": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RabbitMQ1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEXO": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GRAUPARENTESCO": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "De Para - Depend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Dirhect": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9ff8ca83-f698-4af8-824e-feafdd7f5fae",
+  "activeVersionId": "9ff8ca83-f698-4af8-824e-feafdd7f5fae",
+  "versionCounter": 22,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-03-12T09:45:01.193Z",
+      "createdAt": "2026-03-12T09:45:01.193Z",
+      "role": "workflow:owner",
+      "workflowId": "K2EGknSIrTZ6Aifo",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
