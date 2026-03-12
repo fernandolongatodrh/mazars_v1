@@ -1,0 +1,637 @@
+{
+  "updatedAt": "2026-01-29T15:00:14.102Z",
+  "createdAt": "2025-08-02T20:34:44.405Z",
+  "id": "Eymd1KEX5gD46QAh",
+  "name": "Solicitar Demissao",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -480
+      ],
+      "id": "453b6081-1019-4949-ac46-f60f52aa3b28",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant_domain\":\"{{ $json.content.body.referencias.tenant_domain }}\", \n  \"demissao_id\": {{ $json.content.body.referencias.demissao_id }},\n  \"coligada\": {{parseInt( $json.content.body.referencias.id_sistema_origem) }}, \n \"idtarefa\": \"{{ $json.content.body.referencias.tarefa_id }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        -576
+      ],
+      "id": "2bf9cb23-0113-45c1-b141-7f221b8e9434",
+      "name": "Credenciais",
+      "notes": " {{ $json.content.body.referencias.admissao_id }},"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        -576
+      ],
+      "id": "5bb0575d-39ee-4196-9346-e009604324ee",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "jsCode": "const removeSpecials = (str) => {\n  // Remove acentos, permite letras, números, ponto, vírgula, arroba, hífen e espaço\n  return str\n    .normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\") // Remove acentos\n    .replace(/[^A-Z0-9.,@\\- ]/gi, \"\") // Agora permite espaço (note o espaço no final)\n    .toUpperCase();\n};\n\nconst xml = $json.xml || $json.data || $json.text || \"\"; // campo do XML\n\nconst novoXml = xml.replace(/>([^<]+)</g, (match, texto) => {\n  if (texto.trim() === '' || texto.trim().toLowerCase() === 'null') {\n    return '><';\n  }\n  return '>' + removeSpecials(texto) + '<';\n});\n\nreturn { xml: novoXml };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -576
+      ],
+      "id": "99e0c8fc-470a-4eec-9d59-4a3b39b8615f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_SolicitarDemissao",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "jsonParseBody": true
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -672
+      ],
+      "id": "5e42a134-3bd9-4cc7-b1b8-37c1b41e9cec",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"CHAPA\": \"{{ $json.CHAPA }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        -576
+      ],
+      "id": "a1495639-dde6-471f-b383-7f5eb1d8893f",
+      "name": "FERIAS"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/demissao/{{ $('Credenciais').item.json.demissao_id }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        -576
+      ],
+      "id": "d2db040e-6bbb-4bc7-a3dc-7454f1c7a55f",
+      "name": "Demissao"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.servidor }}/wsDataServer/IwsDataServer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "SOAPAction",
+              "value": "http://www.totvs.com/IwsDataServer/SaveRecord"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tot=\"http://www.totvs.com/\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <tot:SaveRecord>\n         <!--Optional:-->\n         <tot:DataServerName>FopRescisaoData</tot:DataServerName>\n         <!--Optional:-->\n         <tot:XML><![CDATA[{{ $json.xml }}]]></tot:XML>\n         <!--Optional:-->\n         <tot:Contexto>CODCOLIGADA=443</tot:Contexto>\n      </tot:SaveRecord>\n   </soapenv:Body>\n</soapenv:Envelope>",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1136,
+        -576
+      ],
+      "id": "2f612004-37f6-4db9-9d88-770794a6e543",
+      "name": "EnviaRM1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -576
+      ],
+      "id": "6263a162-faf1-467e-9038-6159b0bb4619",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        -480
+      ],
+      "id": "e853bea6-a239-4440-b606-addd5d1c67f4",
+      "name": "RabbitMQ1",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00068730-e36b-4b41-83d8-032ae70e1bd4",
+              "leftValue": "={{ $json['s:Envelope']['s:Body'].SaveRecordResponse.SaveRecordResult }}",
+              "rightValue": "={{ $('Credenciais').item.json.coligada }};{{ $('Demissao').item.json.funcionario_objeto.chapa }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        -576
+      ],
+      "id": "5a7292cd-28ad-42ec-aee2-5ccd4c04e96b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        -672
+      ],
+      "id": "208a37d7-d502-4d1f-813f-300a2c9dc052",
+      "name": "RabbitMQ2",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tabela_dominio/tipo_demissao/{{ $('Demissao').item.json.tipo }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        -576
+      ],
+      "id": "4606fc91-6155-483c-a9bd-2fd828433b5a",
+      "name": "TIPO"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tabela_dominio/motivo_demissao/{{ $('Demissao').item.json.motivo }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -576
+      ],
+      "id": "2e23c8cf-3f6e-45c2-8046-5301b7dd99ec",
+      "name": "MOTIVO"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "=<FopRescisaoFunc>\n         <PFunc>   \n\t\t\t<CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n\t\t\t<CHAPA>{{ $('Demissao').item.json.funcionario_objeto.chapa }}</CHAPA>\t\t\t\t\n\t\t\t<TIPODEMISSAO>{{ $('TIPO').item.json.registro.id_origem }}</TIPODEMISSAO>\t\n\t\t\t<DEMISSAODESEMPISULFINAD></DEMISSAODESEMPISULFINAD>\n\t\t\t<DESCONTAAVISOPREVIO></DESCONTAAVISOPREVIO> \n\t\t\t<TEMAVISOPREVIO></TEMAVISOPREVIO> \n\t\t\t<DTAVISOPREVIO></DTAVISOPREVIO>\n\t\t\t<NRODIASAVISO></NRODIASAVISO>\n\t\t\t<DISPENSADOAVISO></DISPENSADOAVISO>\n\t\t\t<TIPOREDUCAOAVISO></TIPOREDUCAOAVISO>\n\t\t\t<FORMAREDUCAOAVISO></FORMAREDUCAOAVISO>\n\t\t\t<OBSERVACAOAVISOPREVIO></OBSERVACAOAVISOPREVIO>\n\t\t\t<DATADEMISSAO>{{ $('Demissao').item.json.data }}</DATADEMISSAO>\n\t\t\t<DTDESLIGAMENTO></DTDESLIGAMENTO>\n\t\t\t<DTPAGTORESCISAO></DTPAGTORESCISAO>\n\t\t\t<DTULTIMOMOVIM></DTULTIMOMOVIM>\n\t\t\t<PERIODORESCISAO></PERIODORESCISAO>\n\t\t\t<CODSAQUEFGTS></CODSAQUEFGTS>\n\t\t\t<MOTIVODEMISSAO>{{ \n  typeof $json.registro.id_origem === 'number' || \n  (typeof $json.registro.id_origem === 'string' && /^\\d$/.test($json.registro.id_origem)) \n    ? String($json.registro.id_origem).replace(/^(\\d)$/, '0$1') \n    : $json.registro.id_origem \n}}</MOTIVODEMISSAO>\n\t\t\t<SALDOFGTS></SALDOFGTS>\n\t\t\t<NROPROCESSOTRAB></NROPROCESSOTRAB>\n\t\t\t<NROATESTADOOBITO></NROATESTADOOBITO>\n\t\t\t<TEMPRAZOCONTR></TEMPRAZOCONTR>\n\t\t\t<TIPOCONTRATOPRAZO></TIPOCONTRATOPRAZO>\n\t\t\t<FIMPRAZOCONTR></FIMPRAZOCONTR>\n\t\t\t<REPOEVAGA></REPOEVAGA>\n\t\t\t<OBSERVACAORESCISAO></OBSERVACAORESCISAO>\t\n\t\t</PFunc>\n\t\t<PDadosRescisao>\n\t\t\t<CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n\t\t\t<CHAPA>{{ $('Demissao').item.json.funcionario_objeto.chapa }}</CHAPA>\n\t\t\t<CUMPRIUJORNADAINTEGRAL></CUMPRIUJORNADAINTEGRAL>\n\t\t\t<JORNADASEMANA></JORNADASEMANA>\n\t\t\t<TEMNOVOEMPREGO></TEMNOVOEMPREGO>\t\t\n\t\t</PDadosRescisao>\n\t\t\n</FopRescisaoFunc>",
+              "type": "string"
+            },
+            {
+              "id": "20576556-102e-436b-8c71-9e22e44da760",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -384
+      ],
+      "id": "cc8d62b1-1de2-493d-990b-bbf503088e78",
+      "name": "De Para XML Ferias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "=<FopRescisaoFunc>\n         <PFunc>   \n\t\t\t<CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n\t\t\t<CHAPA>{{ $('Demissao').item.json.funcionario_objeto.chapa }}</CHAPA>\t\t\t\t\n\t\t\t<TIPODEMISSAO>{{ $('TIPO').item.json.registro.id_origem }}</TIPODEMISSAO>\t\t\t\n\t\t\t<DATADEMISSAO>{{ $('Demissao').item.json.data }}</DATADEMISSAO>\n<DTDESLIGAMENTO>{{ $('Demissao').item.json.data }}</DTDESLIGAMENTO>\n\t\t\t<DTPAGTORESCISAO>{{ $('Demissao').item.json.data_pagamento }}</DTPAGTORESCISAO>\n\t\t\t<DTULTIMOMOVIM>{{ $('Demissao').item.json.data }}</DTULTIMOMOVIM>\n\t\t\t<MOTIVODEMISSAO>{{ \n  typeof $json.registro.id_origem === 'number' || \n  (typeof $json.registro.id_origem === 'string' && /^\\d$/.test($json.registro.id_origem)) \n    ? String($json.registro.id_origem).replace(/^(\\d)$/, '0$1') \n    : $json.registro.id_origem \n}}</MOTIVODEMISSAO>\n<DTAVISOPREVIO>{{ $('Demissao').item.json.data_inicio_aviso }}</DTAVISOPREVIO> <TEMAVISOPREVIO>{{ $('Demissao').item.json.aviso_indenizado ? 1 : 0 }}</TEMAVISOPREVIO>\n        <OBSERVACAORESCISAO>{{ $('Demissao').item.json.observacao }}</OBSERVACAORESCISAO>\n\t\t</PFunc>\n\t\t<PDadosRescisao>\n\t\t\t<CODCOLIGADA>{{ $('Credenciais').item.json.coligada }}</CODCOLIGADA>\n\t\t\t<CHAPA>{{ $('Demissao').item.json.funcionario_objeto.chapa }}</CHAPA> \n\t\t</PDadosRescisao>\n\t\t\n</FopRescisaoFunc>",
+              "type": "string"
+            },
+            {
+              "id": "20576556-102e-436b-8c71-9e22e44da760",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        -576
+      ],
+      "id": "61a2d9eb-3e2c-4740-9474-45ffe29fe46f",
+      "name": "De Para XML Demissao"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/concluir/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"mensagem\" : \"Demissão realizada com sucesso\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1808,
+        -672
+      ],
+      "id": "cf2ec314-52be-47fd-a52c-514473a7b9cd",
+      "name": "Concluir Tarefa com Sucesso"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"mensagem\" : \"Erro No Processo de Demissão: {{ $json['s:Envelope']['s:Body'].SaveRecordResponse.SaveRecordResult.toJsonString().replaceAll('\"','') }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1808,
+        -480
+      ],
+      "id": "d228aac2-3cb5-402a-8f12-c67c31a8ffb6",
+      "name": "Rejeitar Tarefa"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        -480
+      ],
+      "id": "838f9bd1-c1c0-4909-abf0-7b57202f8ad8",
+      "name": "Stop and Error"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "FERIAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "EnviaRM1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FERIAS": {
+      "main": [
+        [
+          {
+            "node": "Demissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Demissao": {
+      "main": [
+        [
+          {
+            "node": "TIPO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviaRM1": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Concluir Tarefa com Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejeitar Tarefa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIPO": {
+      "main": [
+        [
+          {
+            "node": "MOTIVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MOTIVO": {
+      "main": [
+        [
+          {
+            "node": "De Para XML Demissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para XML Demissao": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluir Tarefa com Sucesso": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejeitar Tarefa": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c6d771c9-516c-4212-a1f8-5818a5c96737",
+  "activeVersionId": "c6d771c9-516c-4212-a1f8-5818a5c96737",
+  "versionCounter": 10,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-08-02T20:34:44.405Z",
+      "createdAt": "2025-08-02T20:34:44.405Z",
+      "role": "workflow:owner",
+      "workflowId": "Eymd1KEX5gD46QAh",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
