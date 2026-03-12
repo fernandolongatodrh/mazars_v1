@@ -1,0 +1,540 @@
+{
+  "updatedAt": "2026-01-29T15:01:08.543Z",
+  "createdAt": "2025-08-01T04:57:42.062Z",
+  "id": "FqbQgphIxOAGCnow",
+  "name": "Solicitar Ferias",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -576
+      ],
+      "id": "ad91b346-b359-4c06-b6a5-d6ab4ccde97d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"servidor\": \"172.16.60.23:8051\",\n  \"autorizacao\": \"Basic YXRpdmFyeS5icm9kcmlndWVzOkxhZmFtaWxpQDAxMw==\",\n  \"tenant_domain\":\"{{ $json.content.body.referencias.tenant_domain }}\", \n  \"idferias\": {{ $json.content.body.referencias.ferias_id }},\n  \"coligada\": {{ parseInt($json.content.body.referencias.id_sistema_origem) }}, \n \"idtarefa\": \"{{ $json.content.body.referencias.tarefa_id }}\"\n}\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -672
+      ],
+      "id": "39ee07dc-431a-4fa0-9a34-9320c0dc669f",
+      "name": "Credenciais",
+      "notes": " {{ $json.content.body.referencias.admissao_id }},"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $json.tenant_domain }}/api/app-login/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"integracao\",  \"password\": \"J!F@m3a4m5j6\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        336,
+        -672
+      ],
+      "id": "fdba4fe2-be13-4bd8-8346-ae62d9f213ab",
+      "name": "TokenDirhect"
+    },
+    {
+      "parameters": {
+        "jsCode": "const removeSpecials = (str) => {\n  // Remove acentos, permite letras, números, ponto, vírgula, arroba, hífen e espaço\n  return str\n    .normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\") // Remove acentos\n    .replace(/[^A-Z0-9.,@\\- ]/gi, \"\") // Agora permite espaço (note o espaço no final)\n    .toUpperCase();\n};\n\nconst xml = $json.xml || $json.data || $json.text || \"\"; // campo do XML\n\nconst novoXml = xml.replace(/>([^<]+)</g, (match, texto) => {\n  if (texto.trim() === '' || texto.trim().toLowerCase() === 'null') {\n    return '><';\n  }\n  return '>' + removeSpecials(texto) + '<';\n});\n\nreturn { xml: novoXml };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -672
+      ],
+      "id": "ea5c683b-b4fd-4b63-b0d2-e9d50056e4d5",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.servidor}}/rmsrestdataserver/rest/FopFuFeriasPerDataBR",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('Credenciais').item.json.autorizacao }}"
+            },
+            {
+              "name": "CODCOLIGADA",
+              "value": "443"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.xml }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        -672
+      ],
+      "id": "8225c56e-c43a-48b4-aff8-c7d7c839bdac",
+      "name": "EnviaRM",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "queue": "Dirhect_MarcaFerias",
+        "options": {
+          "acknowledge": "laterMessageNode",
+          "durable": true,
+          "jsonParseBody": true
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -768
+      ],
+      "id": "8e66aa95-3f90-4a67-832a-e304141f61a1",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n\"CHAPA\": \"{{ $json.CHAPA }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -672
+      ],
+      "id": "dc08d576-5ccf-4bae-88ac-5e7e5770ee73",
+      "name": "FERIAS"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/feriasperiodogozo/{{ $('Credenciais').item.json.idferias }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        784,
+        -672
+      ],
+      "id": "83dca6ca-fdff-44b9-8e7c-443e084bded4",
+      "name": "Ferias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e53ab464-2b84-483f-9625-571b0aa9eba9",
+              "name": "xml",
+              "value": "={\n    \"CODCOLIGADA\": {{ $('Credenciais').item.json.coligada }},\n\t\"CHAPA\": \"{{ $json.tarefas[0].objeto.funcionario_detalhe.chapa }}\",\n\t\"FIMPERAQUIS\": \"{{ $json.fimperaquis }}\",\n\t\"DATAPAGTO\": \"{{ $json.datapagamento }}\",\n\t\"DATAINICIO\": \"{{ $json.dt_inicio }}\",\n\t\"DATAFIM\": \"{{ $json.dt_fim }}\",\n\t\"SITUACAOFERIAS\": \"M\",\n\t\"NRODIASFERIAS\": {{ $json.nrodiasferias }} ,\n\t\"NRODIASABONO\": {{ $json.nrodiasabono }},\n\t\"NRODIASFERIADO\": null,\n\t\"NRODIASFERIASCORRIDOS\": 0.00,\n\t\"NRODIASABONOCORRIDOS\": 0.00,\n\t\"POSICAOABONO\": 0,\t\n\t\"DATAAVISO\": \"{{ $json.aviso_ferias }}\",\n\t\"PAGA1APARC13O\": {{ $json.adiantar_13 ? 1 : 0 }},\n\t\"NDIASLICREM1\": null,\n\t\"NDIASLICREM2\": null,\n\t\"FERIASCOLETIVAS\": {{ $json.ferias_coletivas ? 1 : 0}},\n\t\"FERIASPERDIDAS\": null,\n\t\"OBSERVACAO\": null,\n\t\"INICIOPERAQUIS\": null,\n\t\"FALTAS\": null,\n\t\"DATAINICIODESCEMPR\": null,\n\t\"NROVEZESDESCEMPR\": null,\n\t\"NRODIASANTECIPADOS\": null,\n\t\"FIMPERAQUISANTEC\": null,\n\t\"DATAPAGTOANTEC\": null,\n\t\"PERIODOANTECIPADO\": null,\n\t\"FALTASPROP\": null,\n\t\"FERIASCOMPULSORIA\": null\n}",
+              "type": "string"
+            },
+            {
+              "id": "20576556-102e-436b-8c71-9e22e44da760",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        -672
+      ],
+      "id": "25bf1fcd-64af-4e12-bfed-fb0fccfc1634",
+      "name": "De Para XML Ferias3"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage"
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        -736
+      ],
+      "id": "3473d29b-7569-4b8d-8d2a-e23b9594a300",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "eYW8lnK5hcVU6M4e",
+          "name": "Dirhect - RabbitMQ"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/concluir/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"mensagem\" : \"Ferias cadastradas com sucesso, calcular.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        -736
+      ],
+      "id": "1bee6cb1-6e64-4e4b-a36f-5de271534228",
+      "name": "Finaliza Tarefa",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/tarefas/{{ $('Credenciais').item.json.idtarefa }}/rejeitar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (() => {\n    // 1) Captura o erro original da entrada atual\n    const rawError = $json[\"error\"]?.[\"message\"] || $json[\"message\"] || \"\";\n    const raw = String(rawError).trim();\n\n    // 2) Extrai o bloco entre aspas (JSON do RM)\n    const m = raw.match(/\\d{3}\\s*-\\s*\"([\\s\\S]*)\"/);\n    const inner = m ? m[1] : raw;\n\n    // 3) Desescapa e tenta Parse\n    const unescaped = inner.replace(/\\\\\"/g, '\"').replace(/\\\\\\\\/g, '\\\\');\n    \n    let treatedMsg = unescaped;\n    try { \n        const obj = JSON.parse(unescaped); \n        treatedMsg = obj?.messages?.[0]?.detail || obj?.messages?.[0]?.message || unescaped;\n    } catch (e) {}\n\n    // 4) Limpa a mensagem tratada\n    treatedMsg = String(treatedMsg)\n      .replace(/\\\\r|\\\\n|\\r|\\n/g, ' ')\n      .replace(/\\s{2,}/g, ' ')\n      .replace(/^\"+|\"+$/g, '')\n      .trim();\n\n    // 5) Retorna o JSON com as duas chaves\n    return {\n      \"mensagem\": treatedMsg,\n      \"erro_origem\": rawError\n    };\n})() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        -512
+      ],
+      "id": "36673907-344e-4b46-9b2a-c6c91c889df0",
+      "name": "Finaliza Tarefa1"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://{{ $('Credenciais').item.json.tenant_domain }}/api/feriasperiodogozo/{{ $('Credenciais').item.json.idferias }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"funcionario\": {{ $('Ferias').item.json.funcionario_id }},\"situacaoferias\": \"M\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1664,
+        -736
+      ],
+      "id": "4873630b-daab-4d7c-aabf-b9aa303fa73f",
+      "name": "AjustarFerias"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://{{ $('Credenciais').item.json.tenant }}.mazars.com.br/api/ferias/{{ $('Credenciais').item.json.idferias }}/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('TokenDirhect').item.json.access }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"funcionario\": \"{{ $('Ferias').item.json.tarefas[0].objeto.funcionario_detalhe.id }}\",\n  \"datapagamento\": null,\n  \"dt_inicio\": null,\n  \"dt_fim\": null,\n  \"nrodiasabono\": null,\n  \"nrodiasferias\": null,\n  \"situacaoferias\": null,\n  \"observacao\": null,\n  \"periodo_aberto\": true,\n  \"periodo_perdido\": false,\n  \"adiantar_13\": false}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2112,
+        -272
+      ],
+      "id": "b325d68a-1d0e-4156-b0e4-c4245227c1e6",
+      "name": "AjustarFerias1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "error.message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        -272
+      ],
+      "id": "f31c41eb-99f5-424c-b68b-b3b92f92246f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Integração"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -512
+      ],
+      "id": "d92fcf2d-8e88-45c1-9a42-fd58d3497320",
+      "name": "Stop and Error"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "TokenDirhect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TokenDirhect": {
+      "main": [
+        [
+          {
+            "node": "FERIAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "EnviaRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviaRM": {
+      "main": [
+        [
+          {
+            "node": "AjustarFerias",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finaliza Tarefa1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FERIAS": {
+      "main": [
+        [
+          {
+            "node": "Ferias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferias": {
+      "main": [
+        [
+          {
+            "node": "De Para XML Ferias3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "De Para XML Ferias3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AjustarFerias": {
+      "main": [
+        [
+          {
+            "node": "Finaliza Tarefa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AjustarFerias1": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "AjustarFerias1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finaliza Tarefa1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f63c4a5d-2d0e-4981-b053-f8b3453d5f1e",
+  "activeVersionId": "f63c4a5d-2d0e-4981-b053-f8b3453d5f1e",
+  "versionCounter": 10,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-08-01T04:57:42.062Z",
+      "createdAt": "2025-08-01T04:57:42.062Z",
+      "role": "workflow:owner",
+      "workflowId": "FqbQgphIxOAGCnow",
+      "projectId": "xHWOcXNROkzROIfd",
+      "project": {
+        "updatedAt": "2025-07-15T02:51:44.702Z",
+        "createdAt": "2025-07-15T01:56:41.030Z",
+        "id": "xHWOcXNROkzROIfd",
+        "name": "Fernando Longato <fernando.longato@ativary.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
